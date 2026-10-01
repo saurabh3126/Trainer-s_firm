@@ -41,9 +41,18 @@ const upload = multer({ storage: storage });
 // ==========================================
 // 2. DATABASE SETUP & SCHEMAS
 // ==========================================
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully'))
-    .catch(err => console.error('MongoDB Connection Error:', err));
+// Cached connection for serverless
+let isConnected = false;
+const connectDB = async () => {
+    if (isConnected) return;
+    await mongoose.connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 10000,
+    });
+    isConnected = true;
+    console.log('MongoDB Connected');
+};
+connectDB().catch(err => console.error('MongoDB Error:', err));
 
 const vendorSchema = new mongoose.Schema({
     name: { type: String, required: true },
