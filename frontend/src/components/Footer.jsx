@@ -188,10 +188,10 @@ export default function Footer() {
                                 <Mail className="w-4 h-4 mt-0.5 text-slate-800 flex-shrink-0" />
 
                                 <a
-                                    href="mailto:support@trainersdeck.com"
+                                    href="mailto:trainerfirm@outlook.com"
                                     className="hover:text-black transition-colors"
                                 >
-                                    support@trainersdeck.com
+                                    trainerfirm@outlook.com
                                 </a>
                             </li>
 
@@ -199,7 +199,7 @@ export default function Footer() {
                                 <Phone className="w-4 h-4 mt-0.5 text-slate-800 flex-shrink-0" />
 
                                 <span className="text-slate-500">
-                                    +91 (800) 123-4567
+                                    +91 70816 68450
                                 </span>
                             </li>
 

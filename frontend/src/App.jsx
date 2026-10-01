@@ -12,6 +12,7 @@ import AdminDashboard from './components/AdminDashboard.jsx';
 import GradualBlur from './components/GradualBlur.jsx';
 import PolicyPage from './components/PolicyPage.jsx';
 import TermsOfService from './components/TermsOfService.jsx';
+import Guidelines from './components/Guidelines.jsx';
 
 // Page wrapper with fade + slight upward slide on enter
 const PageTransition = ({ children }) => (
@@ -122,6 +123,7 @@ function AppLayout() {
             {/* Legal Routes */}
             <Route path="/privacy" element={<PageTransition><PolicyPage /></PageTransition>} />
             <Route path="/terms"   element={<PageTransition><TermsOfService /></PageTransition>} />
+          <Route path="/guidelines" element={<PageTransition><Guidelines /></PageTransition>} />
           </Routes>
         </AnimatePresence>
       </main>

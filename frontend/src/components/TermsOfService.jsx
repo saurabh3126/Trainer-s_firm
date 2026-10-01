@@ -1,50 +1,43 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 export default function TermsOfService() {
     return (
-        <div className="min-h-screen bg-[#f5f5f5] pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-sm border border-zinc-200 p-8 sm:p-12 relative z-10">
-                <Link to="/" className="inline-flex items-center gap-1.5 text-[11px] font-bold text-zinc-400 hover:text-black transition-colors uppercase tracking-widest mb-8">
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
+        <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6">
+            <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-2xl shadow-sm border border-slate-100">
+                <Link to="/" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-black mb-8 transition-colors">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Home
                 </Link>
-                <h1 className="text-3xl sm:text-4xl font-black text-zinc-900 tracking-tight mb-4">Terms of Service</h1>
-                <p className="text-xs text-zinc-500 mb-8 font-medium uppercase tracking-widest">Last updated: October 1, 2026</p>
-                
-                <div className="space-y-8 text-zinc-600 text-[13px] leading-relaxed font-medium">
-                    <section>
-                        <h2 className="text-base font-black text-zinc-900 mb-3 uppercase tracking-wider">1. Agreement to Terms</h2>
-                        <p>By accessing or using Trainer Firm, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you may not access our platform or use our services.</p>
-                    </section>
 
-                    <section>
-                        <h2 className="text-base font-black text-zinc-900 mb-3 uppercase tracking-wider">2. User Accounts</h2>
-                        <ul className="list-disc pl-5 space-y-2 text-zinc-500">
-                            <li><strong className="text-zinc-800">Responsibility:</strong> You are responsible for safeguarding the password that you use to access the service and for any activities or actions under your password.</li>
-                            <li><strong className="text-zinc-800">Accuracy:</strong> You must provide accurate, complete, and updated information when registering for an account.</li>
-                        </ul>
-                    </section>
+                <h1 className="text-3xl font-black tracking-tight mb-2">Terms of Service</h1>
+                <p className="text-slate-500 mb-8 text-sm">Last updated: October 2, 2026</p>
 
-                    <section>
-                        <h2 className="text-base font-black text-zinc-900 mb-3 uppercase tracking-wider">3. Platform Rules</h2>
-                        <p>When using our platform as either a Vendor or a Trainer, you agree not to:</p>
-                        <ul className="list-disc pl-5 space-y-2 mt-2 text-zinc-500">
-                            <li>Post false, inaccurate, or misleading information.</li>
-                            <li>Use the service for any illegal or unauthorized purpose.</li>
-                            <li>Attempt to bypass our platform to arrange training engagements outside the agreed terms.</li>
-                            <li>Spam, harass, or abuse other users of the platform.</li>
-                        </ul>
-                    </section>
+                <div className="prose prose-slate prose-sm sm:prose-base max-w-none text-slate-600 space-y-6">
+                    <p>Welcome to TrainerFirm. By using this site, you agree to the following.</p>
 
-                    <section>
-                        <h2 className="text-base font-black text-zinc-900 mb-3 uppercase tracking-wider">4. Service Modifications</h2>
-                        <p>We reserve the right to modify or discontinue, temporarily or permanently, the service (or any part thereof) with or without notice. We shall not be liable to you or any third party for any modification, suspension, or discontinuance of the service.</p>
-                    </section>
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">What TrainerFirm is</h2>
+                    <p>TrainerFirm connects vendors and trainers so you can find each other faster. What happens after that, the actual engagement, pay, and terms, is between you and the other person. We're not involved in that part, we just help you get there.</p>
 
-                    <section>
-                        <h2 className="text-base font-black text-zinc-900 mb-3 uppercase tracking-wider">5. Contact</h2>
-                        <p>If you have any questions about these Terms, please contact us at support@trainerfirm.com.</p>
-                    </section>
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">Accounts</h2>
+                    <p>When you post a requirement or sign up, you'll verify your phone number with an OTP. This keeps the postings on TrainerFirm tied to a real, reachable person. You're responsible for what you post, keep it accurate and keep it yours.</p>
+
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">Posting rules</h2>
+                    <p>Postings should be genuine and accurate, real roles, real details. Don't post fake, duplicate, or misleading requirements. Don't use TrainerFirm to collect contact details for anything unrelated to a real training opportunity. Don't harass or misrepresent yourself to other users.</p>
+                    <p>We can remove any posting or suspend any account that breaks these rules, no questions asked, since this keeps the platform usable for everyone else.</p>
+
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">Payments</h2>
+                    <p>TrainerFirm doesn't handle, hold, or guarantee any payment between a vendor and a trainer. Any pay, timelines, or arrangement you agree to is strictly between the two of you.</p>
+
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">No guarantees</h2>
+                    <p>We don't verify the accuracy of every posting or every claim a user makes. Use your own judgement before accepting any engagement, the same way you would with any opportunity you find elsewhere.</p>
+
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">Liability</h2>
+                    <p>TrainerFirm isn't liable for any dispute, loss, or issue arising from an engagement you enter into through the platform. Use the platform at your own discretion.</p>
+
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">Changes</h2>
+                    <p>We may update these terms as TrainerFirm grows. We'll keep this page current, so check back if anything seems to have changed.</p>
                 </div>
             </div>
         </div>

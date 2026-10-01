@@ -157,8 +157,7 @@ export default function LandingPage() {
                             <div className="bg-black border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.5)] transition-all duration-300 relative overflow-hidden">
                                 
                                 <div className="flex items-center justify-between pb-4 border-b border-slate-800 relative z-10">
-                                    <span className="text-xs font-bold tracking-wider text-slate-400 uppercase flex items-center gap-1.5">
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                                    <span className="text-xs font-bold tracking-wider uppercase animate-pulse text-red-500">
                                         Live Requirements
                                     </span>
                                     <span className="text-xs font-semibold text-slate-300 bg-slate-900 px-3 py-1 rounded-full border border-slate-700 shadow-inner">
