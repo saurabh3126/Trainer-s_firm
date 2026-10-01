@@ -754,6 +754,7 @@ app.put('/api/jobs/:id/fulfill', authenticate, async (req, res) => {
 // ==========================================
 // 7. TRAINER ROUTES (View & Contact)
 // ==========================================
+app.get('/api/ping', (req, res) => res.json({pong: true}));
 app.get('/api/jobs', async (req, res) => {
     try {
         const oneWeekAgo = new Date();
