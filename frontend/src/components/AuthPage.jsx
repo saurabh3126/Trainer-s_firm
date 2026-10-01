@@ -42,7 +42,7 @@ export default function AuthPage() {
     useEffect(() => {
         if (isLogin) return;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        setEmailValid(formData.email === '' || emailRegex.test(formData.email));
+        setEmailValid(formData.email === '' || formData.email === undefined || emailRegex.test(formData.email));
 
         const pass = formData.password;
         if (!pass) {
@@ -99,9 +99,7 @@ export default function AuthPage() {
 
         if (!formData.name || !formData.name.trim()) currentErrors.name = true;
         
-        if (!formData.email) {
-            currentErrors.email = true;
-        } else if (!emailValid) {
+        if (formData.email && !emailValid) {
             currentErrors.email = true;
         }
         
@@ -402,9 +400,9 @@ export default function AuthPage() {
 
                                         <div className="grid grid-cols-2 gap-3">
                                             <div>
-                                                <label className={labelCls}>Email</label>
+                                                <label className={labelCls}>Email (Optional)</label>
                                                 <input
-                                                    type="email" name="email" required
+                                                    type="email" name="email"
                                                     placeholder="name@company.com"
                                                     value={formData.email} onChange={handleChange}
                                                     className={getInputCls('unknown')}
