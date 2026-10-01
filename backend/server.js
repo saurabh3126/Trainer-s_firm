@@ -42,17 +42,24 @@ const upload = multer({ storage: storage });
 // 2. DATABASE SETUP & SCHEMAS
 // ==========================================
 // Cached connection for serverless
-let isConnected = false;
 const connectDB = async () => {
-    if (isConnected) return;
+    if (mongoose.connection.readyState >= 1) return;
     await mongoose.connect(process.env.MONGO_URI, {
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 10000,
     });
-    isConnected = true;
     console.log('MongoDB Connected');
 };
-connectDB().catch(err => console.error('MongoDB Error:', err));
+
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('DB Middleware Error:', err);
+        res.status(500).json({ error: 'Database connection failed' });
+    }
+});
 
 const vendorSchema = new mongoose.Schema({
     name: { type: String, required: true },
