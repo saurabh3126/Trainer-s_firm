@@ -64,6 +64,7 @@ function SiteFooter() {
             <ul className="space-y-2 text-xs sm:text-sm">
               <li><Link to="/terms" className="hover:text-black transition-colors">Terms of Service</Link></li>
               <li><Link to="/privacy" className="hover:text-black transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/guidelines" className="hover:text-black transition-colors">Community Guidelines</Link></li>
             </ul>
           </div>
 
@@ -72,11 +73,11 @@ function SiteFooter() {
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li className="flex items-start gap-2">
                 <Mail className="w-3.5 h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
-                <a href="mailto:support@trainerfirm.com" className="hover:text-black transition-colors break-all">support@trainerfirm.com</a>
+                <a href="mailto:trainerfirm@outlook.com" className="hover:text-black transition-colors break-all">trainerfirm@outlook.com</a>
               </li>
               <li className="flex items-start gap-2">
                 <Phone className="w-3.5 h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
-                <span className="text-slate-500">+91 (800) 123-4567</span>
+                <span className="text-slate-500">+91 70816 68450</span>
               </li>
             </ul>
           </div>
