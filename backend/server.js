@@ -13,9 +13,27 @@ const { v2: cloudinary } = require('cloudinary');
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const app = express();
-app.use(cors());
+app.use(helmet());
+const allowedOrigins = ['https://trainerfirm.com', 'https://www.trainerfirm.com', 'https://trainerfirm.in', 'https://www.trainerfirm.in', 'http://localhost:5173'];
+app.use(cors({
+    origin: function(origin, callback) {
+        if (!origin || origin.endsWith('.vercel.app') || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('CORS blocked origin'), false);
+    }
+}));
 app.use(express.json());
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 15,
+    message: { error: 'Too many requests from this IP, please try again after 15 minutes' }
+});
+app.use('/api/auth', authLimiter);
 
 // Initialize Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -34,9 +52,13 @@ const storage = new CloudinaryStorage({
     params: {
         folder: 'venty_resumes',
         resource_type: 'auto', 
+        allowed_formats: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
     }
 });
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }
+});
 
 // ==========================================
 // 2. DATABASE SETUP & SCHEMAS
@@ -587,9 +609,10 @@ app.get('/api/jobs/ai-suggestions', async (req, res) => {
         }
 
         // 1. Fetch matching job subjects currently in database
+        const safeQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
         const existingJobs = await JobPost.find({
             status: 'open',
-            subject: { $regex: query, $options: 'i' }
+            subject: { $regex: safeQuery, $options: 'i' }
         }).distinct('subject');
 
         // 2. Filter local catalog matching the query
@@ -667,9 +690,10 @@ app.get('/api/jobs/city-suggestions', async (req, res) => {
         }
 
         // 1. Fetch matching job cities currently in database
+        const safeQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
         const existingCities = await JobPost.find({
             status: 'open',
-            city: { $regex: query, $options: 'i' }
+            city: { $regex: safeQuery, $options: 'i' }
         }).distinct('city');
 
         // 2. Filter local popular cities list matching query
