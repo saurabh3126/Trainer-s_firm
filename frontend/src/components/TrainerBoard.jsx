@@ -348,8 +348,7 @@ export default function TrainerBoard() {
             {/* Search bar */}
             {!jobId && jobs.length > 0 && (
                 <div className="mb-5 relative z-40">
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/60 via-zinc-200/60 to-emerald-50/60 blur-2xl -z-10 rounded-full transform scale-110" />
-                    <div className="glass-panel rounded-xl overflow-visible">
+                    <div className="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-visible">
 
                         {/* Mobile: search + filter toggle row */}
                         <div className="flex items-center gap-2 p-3 sm:hidden">
@@ -384,7 +383,7 @@ export default function TrainerBoard() {
                                             value={techInput}
                                             onFocus={() => { setShowTechDropdown(true); if (techSuggestions.length === 0) fetchTechSuggestions(techInput); }}
                                             onChange={(e) => { setTechInput(e.target.value); setShowTechDropdown(true); }}
-                                            className="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-lg text-sm font-medium placeholder:text-zinc-500 focus:outline-none focus:bg-white/80 transition-all pr-8"
+                                            className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium placeholder:text-zinc-400 focus:outline-none focus:border-black transition-all pr-8"
                                         />
                                         {techInput && <button onClick={() => { setTechInput(''); setFilterTech('All'); }} className="absolute right-2.5 top-2.5 text-zinc-400 hover:text-zinc-600"><X className="w-3.5 h-3.5" /></button>}
                                     </div>
@@ -410,7 +409,7 @@ export default function TrainerBoard() {
                                                 value={cityInput}
                                                 onFocus={() => setShowCityDropdown(true)}
                                                 onChange={(e) => { setCityInput(e.target.value); setShowCityDropdown(true); }}
-                                                className="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-lg text-sm font-medium placeholder:text-zinc-500 focus:outline-none focus:bg-white/80 transition-all pr-7"
+                                                className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium placeholder:text-zinc-400 focus:outline-none focus:border-black transition-all pr-7"
                                             />
                                             {cityInput && <button onClick={() => { setCityInput(''); setFilterCity('All'); }} className="absolute right-2 top-2.5 text-zinc-400 hover:text-zinc-600"><X className="w-3.5 h-3.5" /></button>}
                                         </div>
@@ -426,7 +425,7 @@ export default function TrainerBoard() {
                                     <div ref={modeDropdownRef}>
                                         <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1.5">Mode</label>
                                         <div className="relative">
-                                            <button onClick={() => setShowModeDropdown(!showModeDropdown)} className="w-full flex items-center justify-between px-3 py-2 bg-white/40 border border-white/60 rounded-lg text-sm font-medium text-zinc-700 hover:bg-white/60 focus:outline-none focus:bg-white/80 transition-all">
+                                            <button onClick={() => setShowModeDropdown(!showModeDropdown)} className="w-full flex items-center justify-between px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-700 focus:outline-none focus:border-black transition-all">
                                                 <span className={filterMode === 'All' ? 'text-zinc-400' : 'text-zinc-900 font-bold capitalize'}>{filterMode === 'All' ? 'All' : filterMode}</span>
                                                 <ChevronDown className="w-4 h-4 text-zinc-400" />
                                             </button>
@@ -479,7 +478,7 @@ export default function TrainerBoard() {
                                     <input
                                         type="text"
                                         placeholder="e.g. AWS trainer"
-                                        className="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-lg text-sm font-medium text-zinc-900 placeholder:text-zinc-500 focus:outline-none focus:bg-white/80 focus:border-zinc-300 transition-all"
+                                        className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
@@ -494,7 +493,7 @@ export default function TrainerBoard() {
                                             value={techInput}
                                             onFocus={() => { setShowTechDropdown(true); if (techSuggestions.length === 0) fetchTechSuggestions(techInput); }}
                                             onChange={(e) => { setTechInput(e.target.value); setShowTechDropdown(true); }}
-                                            className="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-lg text-sm font-medium text-zinc-900 placeholder:text-zinc-500 focus:outline-none focus:bg-white/80 focus:border-zinc-300 transition-all pr-8"
+                                            className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all pr-8"
                                         />
                                         {techInput && <button onClick={() => { setTechInput(''); setFilterTech('All'); }} className="absolute right-2.5 top-2.5 text-zinc-400 hover:text-zinc-600"><X className="w-3.5 h-3.5" /></button>}
                                     </div>
@@ -518,7 +517,7 @@ export default function TrainerBoard() {
                                             value={cityInput}
                                             onFocus={() => setShowCityDropdown(true)}
                                             onChange={(e) => { setCityInput(e.target.value); setShowCityDropdown(true); }}
-                                            className="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-lg text-sm font-medium text-zinc-900 placeholder:text-zinc-500 focus:outline-none focus:bg-white/80 focus:border-zinc-300 transition-all pr-8"
+                                            className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all pr-8"
                                         />
                                         {cityInput && <button onClick={() => { setCityInput(''); setFilterCity('All'); }} className="absolute right-2.5 top-2.5 text-zinc-400 hover:text-zinc-600"><X className="w-3.5 h-3.5" /></button>}
                                     </div>
@@ -535,7 +534,7 @@ export default function TrainerBoard() {
                                 <div ref={modeDropdownRef}>
                                     <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1.5">Work mode</label>
                                     <div className="relative">
-                                        <button onClick={() => setShowModeDropdown(!showModeDropdown)} className="w-full flex items-center justify-between px-3 py-2 bg-white/40 border border-white/60 rounded-lg text-sm font-medium text-zinc-700 hover:bg-white/60 focus:outline-none focus:bg-white/80 transition-all">
+                                        <button onClick={() => setShowModeDropdown(!showModeDropdown)} className="w-full flex items-center justify-between px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-700 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all">
                                             <span className={filterMode === 'All' ? 'text-zinc-700' : 'text-zinc-900 font-bold capitalize'}>{filterMode === 'All' ? 'All modes' : filterMode}</span>
                                             <ChevronDown className="w-4 h-4 text-zinc-400" />
                                         </button>
