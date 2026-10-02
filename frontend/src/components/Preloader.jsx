@@ -16,7 +16,7 @@ export default function Preloader({ onComplete }) {
 
   // Trigger exit after 2s
   useEffect(() => {
-    const t = setTimeout(() => setPhase('exit'), 1500);
+    const t = setTimeout(() => setPhase('exit'), 1250);
     return () => clearTimeout(t);
   }, []);
 
