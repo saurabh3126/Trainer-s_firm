@@ -1,4 +1,28 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?trainerfirm\\.in"
+        }
+      ],
+      "destination": "https://trainerfirm.com/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www\\.trainerfirm\\.com"
+        }
+      ],
+      "destination": "https://trainerfirm.com/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
