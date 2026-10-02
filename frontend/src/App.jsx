@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-do
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import LandingPage from './components/LandingPage.jsx';
+import SplashCursor from './components/SplashCursor.jsx';
 import FloatingNavbar from './components/FloatingNavbar.jsx';
 import VendorDashboard from './components/VendorDashboard.jsx';
 import TrainerBoard from './components/TrainerBoard.jsx';
@@ -99,6 +100,7 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] font-sans text-zinc-900 flex flex-col relative">
+      <SplashCursor RAINBOW_MODE={false} COLOR="#10b981" />
       {!isAuth && <FloatingNavbar />}
       <main className="flex-grow overflow-hidden flex flex-col">
         <AnimatePresence mode="wait">
