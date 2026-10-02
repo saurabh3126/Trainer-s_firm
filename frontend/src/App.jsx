@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import LandingPage from './components/LandingPage.jsx';
 import SplashCursor from './components/SplashCursor.jsx';
+import MoltenMetal from './components/MoltenMetal.jsx';
 import FloatingNavbar from './components/FloatingNavbar.jsx';
 import VendorDashboard from './components/VendorDashboard.jsx';
 import TrainerBoard from './components/TrainerBoard.jsx';
@@ -99,7 +100,17 @@ function AppLayout() {
   const isAuth = location.pathname === '/auth';
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] font-sans text-zinc-900 flex flex-col relative">
+    <div className="min-h-screen bg-transparent font-sans text-zinc-900 flex flex-col relative">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <MoltenMetal
+          color1="#ffffff"
+          color2="#e4e4e7"
+          color3="#d4d4d8"
+          backgroundColor="#f5f5f5"
+          lightMode={true}
+          opacity={0.8}
+        />
+      </div>
       <SplashCursor RAINBOW_MODE={false} COLOR="#ffffff" />
       {!isAuth && <FloatingNavbar />}
       <main className="flex-grow overflow-hidden flex flex-col">
