@@ -287,7 +287,7 @@ export default function LandingPage() {
                         { num: '03', title: 'Direct coordination', desc: 'Immediate one-to-one WhatsApp coordination with pre-formatted requirements and direct candidate credentials.' },
                         { num: '04', title: 'Clear oversight', desc: 'Track open roles, applications, fulfillment, and responses in real time with transparent status logs.' }
                     ].map((feature, i) => (
-                        <div key={i} className="p-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-slate-400 hover:shadow-md transition-all duration-300">
+                        <div key={i} className="card-revolve p-8 bg-white rounded-2xl shadow-sm cursor-pointer">
                             <div className="text-xs font-mono font-bold text-slate-400 mb-4">{feature.num}</div>
                             <h3 className="text-lg font-bold text-black mb-2">{feature.title}</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">{feature.desc}</p>
