@@ -197,7 +197,7 @@ export default function LandingPage() {
 
                                                 {/* Revolving Border Layer */}
                                                 <div className="absolute inset-[-1px] rounded-xl overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none -z-20">
-                                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-square bg-[conic-gradient(from_0deg,transparent_0_75%,#fff_100%)] animate-[spin_2.5s_linear_infinite]" />
+                                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-square bg-[conic-gradient(from_0deg,transparent_0deg,transparent_260deg,#10b981_310deg,#000_360deg)] animate-[spin_2.5s_linear_infinite]" />
                                                 </div>
 
                                                 {/* Content Container */}
