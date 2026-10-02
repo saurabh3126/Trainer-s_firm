@@ -1,120 +1,129 @@
 import { useEffect, useState } from 'react';
 
-export default function Preloader({ onComplete }) {
-  const [phase, setPhase] = useState('visible'); // skip 'enter', show immediately
+const LETTERS = ['T','R','A','I','N','E','R',' ','F','I','R','M'];
 
+export default function Preloader({ onComplete }) {
+  const [phase, setPhase] = useState('visible');
+  const [litCount, setLitCount] = useState(0);
+
+  // Stagger-light each letter
   useEffect(() => {
-    const visibleTimer = setTimeout(() => setPhase('exit'), 1800);
-    return () => clearTimeout(visibleTimer);
+    const timers = LETTERS.map((_, i) =>
+      setTimeout(() => setLitCount(i + 1), 120 + i * 100)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  // Trigger exit after 2s
+  useEffect(() => {
+    const t = setTimeout(() => setPhase('exit'), 2000);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
     if (phase === 'exit') {
-      const exitTimer = setTimeout(() => {
-        if (onComplete) onComplete();
-      }, 700);
-      return () => clearTimeout(exitTimer);
+      const t = setTimeout(() => { if (onComplete) onComplete(); }, 700);
+      return () => clearTimeout(t);
     }
   }, [phase, onComplete]);
 
+  const isExiting = phase === 'exit';
+
   return (
     <div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
       style={{
-        background: '#f5f5f5',
-        opacity: phase === 'exit' ? 0 : 1,
-        transform: phase === 'exit' ? 'scale(1.02)' : 'scale(1)',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 36,
+        background: 'rgba(245,245,245,0.45)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        opacity: isExiting ? 0 : 1,
+        transform: isExiting ? 'scale(1.03)' : 'scale(1)',
         transition: 'opacity 0.65s cubic-bezier(0.4,0,0.2,1), transform 0.65s cubic-bezier(0.4,0,0.2,1)',
-        pointerEvents: phase === 'exit' ? 'none' : 'all',
+        pointerEvents: isExiting ? 'none' : 'all',
       }}
     >
-      {/* Subtle radial glow */}
-      <div
-        className="absolute"
+      {/* Big logo — standalone, no circle */}
+      <img
+        src="/logo-mark.png"
+        alt="Trainer Firm"
         style={{
-          width: 340,
-          height: 340,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)',
-          filter: 'blur(40px)',
-          animation: 'preloader-pulse 2s ease-in-out infinite',
+          height: 90,
+          width: 'auto',
+          objectFit: 'contain',
+          filter: 'drop-shadow(0 4px 24px rgba(16,185,129,0.18))',
+          animation: 'pl-float 3s ease-in-out infinite',
         }}
       />
 
-      {/* Logo + brand — visible immediately */}
-      <div className="relative flex flex-col items-center gap-6">
-        {/* Logo mark */}
-        <div className="relative flex items-center justify-center">
-          {/* Spinning emerald ring */}
-          <svg
-            width="80"
-            height="80"
-            viewBox="0 0 80 80"
-            style={{ animation: 'preloader-spin 1.6s linear infinite', position: 'absolute' }}
-          >
-            <circle cx="40" cy="40" r="36" fill="none" stroke="#e5e7eb" strokeWidth="2" />
-            <circle
-              cx="40"
-              cy="40"
-              r="36"
-              fill="none"
-              stroke="#10b981"
-              strokeWidth="2.5"
-              strokeDasharray="55 171"
-              strokeLinecap="round"
-            />
-          </svg>
-          {/* Logo — dark version since bg is light */}
-          <img
-            src="/logo-mark.png"
-            alt="Trainer Firm"
-            style={{ height: 36, width: 'auto', objectFit: 'contain', position: 'relative', zIndex: 1 }}
-          />
-        </div>
-
-        {/* Brand text */}
-        <div className="flex flex-col items-center gap-2">
-          <div className="flex items-baseline gap-[3px]">
-            <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', color: '#0a0a0a', fontFamily: 'sans-serif' }}>
-              TRAINER
-            </span>
-            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.02em', color: '#71717a', fontFamily: 'sans-serif' }}>
-              FIRM
-            </span>
-          </div>
-
-          {/* Tagline */}
-          <p style={{ fontSize: 11, color: '#9ca3af', letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: 'sans-serif', fontWeight: 500 }}>
-            Finding the right trainer for you
-          </p>
-        </div>
-
-        {/* Progress bar */}
-        <div style={{ width: 160, height: 2, background: '#e5e7eb', borderRadius: 2, overflow: 'hidden' }}>
-          <div
+      {/* Staggered letters */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+        {LETTERS.map((letter, i) => (
+          <span
+            key={i}
             style={{
-              height: '100%',
-              background: 'linear-gradient(90deg, #10b981, #6ee7b7)',
-              borderRadius: 2,
-              animation: 'preloader-bar 1.8s cubic-bezier(0.4,0,0.2,1) forwards',
+              display: 'inline-block',
+              fontSize: letter === ' ' ? 12 : i < 7 ? 28 : 18,
+              fontWeight: i < 7 ? 900 : 700,
+              letterSpacing: i < 7 ? '-0.04em' : '0.02em',
+              color: i < litCount ? '#0a0a0a' : 'rgba(0,0,0,0.12)',
+              transition: 'color 0.3s ease',
+              fontFamily: 'sans-serif',
+              lineHeight: 1,
+              marginLeft: letter === ' ' ? 4 : 0,
             }}
-          />
-        </div>
+          >
+            {letter === ' ' ? '\u00a0' : letter}
+          </span>
+        ))}
       </div>
 
+      {/* Expanding emerald line */}
+      <div style={{ position: 'relative', width: 200, height: 2, overflow: 'hidden', borderRadius: 2, background: 'rgba(0,0,0,0.07)' }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(90deg, #10b981, #6ee7b7, #10b981)',
+            backgroundSize: '200% 100%',
+            borderRadius: 2,
+            animation: 'pl-bar 2s cubic-bezier(0.4,0,0.2,1) forwards, pl-shimmer 1.2s ease infinite',
+          }}
+        />
+      </div>
+
+      {/* Tagline */}
+      <p style={{
+        fontSize: 10,
+        color: '#9ca3af',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+        fontFamily: 'sans-serif',
+        fontWeight: 500,
+        marginTop: -16,
+      }}>
+        Connecting trainers & vendors
+      </p>
+
       <style>{`
-        @keyframes preloader-spin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+        @keyframes pl-float {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-6px); }
         }
-        @keyframes preloader-pulse {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50%       { opacity: 1;   transform: scale(1.08); }
-        }
-        @keyframes preloader-bar {
+        @keyframes pl-bar {
           0%   { width: 0%; }
-          60%  { width: 80%; }
+          60%  { width: 85%; }
           100% { width: 100%; }
+        }
+        @keyframes pl-shimmer {
+          0%   { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
         }
       `}</style>
     </div>

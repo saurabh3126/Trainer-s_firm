@@ -101,16 +101,6 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-transparent font-sans text-zinc-900 flex flex-col relative">
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <MoltenMetal
-          color1="#ffffff"
-          color2="#e4e4e7"
-          color3="#d4d4d8"
-          backgroundColor="#f5f5f5"
-          lightMode={true}
-          opacity={0.8}
-        />
-      </div>
             {!isAuth && <FloatingNavbar />}
       <main className="flex-grow overflow-hidden flex flex-col">
         <AnimatePresence mode="wait">
@@ -164,14 +154,19 @@ function App() {
 
   return (
     <BrowserRouter>
+      {/* Always-on background — visible even during preloader */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <MoltenMetal
+          color1="#ffffff"
+          color2="#e4e4e7"
+          color3="#d4d4d8"
+          backgroundColor="#f5f5f5"
+          lightMode={true}
+          opacity={0.8}
+        />
+      </div>
       {!ready && <Preloader onComplete={() => setReady(true)} />}
-      <div
-        style={{
-          opacity: ready ? 1 : 0,
-          transition: 'opacity 0.4s ease',
-          visibility: ready ? 'visible' : 'hidden',
-        }}
-      >
+      <div style={{ opacity: ready ? 1 : 0, transition: 'opacity 0.5s ease' }}>
         <AppLayout />
       </div>
     </BrowserRouter>
