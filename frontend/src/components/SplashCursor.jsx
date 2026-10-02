@@ -1060,7 +1060,7 @@ function SplashCursor({
 
   return (
     <div
-      className="opacity-15 sm:opacity-30 mix-blend-multiply"
+      className="opacity-30 sm:opacity-50 invert mix-blend-multiply"
       style={{
         position: 'fixed',
         top: 0,
