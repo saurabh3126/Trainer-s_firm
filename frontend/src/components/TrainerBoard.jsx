@@ -699,7 +699,7 @@ export default function TrainerBoard() {
                                         <div className="flex items-center gap-2 flex-shrink-0">
                                             <div className="flex items-center gap-2">
                                                 <button
-                                                    onClick={() => handleShare(job._id)}
+                                                    onClick={() => handleShare(job._id, job.subject)}
                                                     className="p-1.5 border border-zinc-200 rounded-lg text-zinc-400 hover:border-zinc-400 hover:text-zinc-900 transition-all relative"
                                                     title="Copy link"
                                                 >
@@ -898,7 +898,7 @@ export default function TrainerBoard() {
                     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto border border-zinc-200">
                         <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10 bg-white rounded-lg">
                             <button
-                                onClick={() => handleShare(viewJobDetails._id)}
+                                onClick={() => handleShare(viewJobDetails._id, viewJobDetails.subject)}
                                 className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-all relative"
                                 title="Copy link"
                             >

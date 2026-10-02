@@ -286,7 +286,13 @@ export default function ProfilePage() {
                                         <div>
                                             <label className="block text-xs font-bold text-slate-700 mb-1.5">Years of experience</label>
                                             <div className="relative flex items-center">
-                                                <input type="text" value={profileData.experience_years} onChange={e => setProfileData({...profileData, experience_years: e.target.value})} className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400" />
+                                                <input type="number" min="0" max="30" value={profileData.experience_years} onChange={(e) => {
+    let val = parseInt(e.target.value, 10);
+    if (isNaN(val)) val = '';
+    else if (val < 0) val = 0;
+    else if (val > 30) val = 30;
+    setProfileData({...profileData, experience_years: val});
+}} className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400" />
                                             </div>
                                         </div>
                                     </div>

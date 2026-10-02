@@ -343,7 +343,7 @@ app.post('/api/auth/register', async (req, res) => {
         if (!otpRecord) return res.status(400).json({ error: "OTP session expired. Please restart registration." });
 
         const verificationId = otpRecord.otp; // stored as verificationId or plain OTP code
-        const isMcFlow = verificationId && /^\d+$/.test(verificationId); // MC verificationId is purely numeric
+        const isMcFlow = verificationId && verificationId.length > 10; // MC verificationIds are long strings/UUIDs
         if (isMcFlow) {
             // Validate against Message Central
             try {

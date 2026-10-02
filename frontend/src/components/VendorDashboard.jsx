@@ -45,7 +45,7 @@ export default function VendorDashboard() {
         contact_number: '', 
         vendor_phone: '', // WhatsApp number
         vendor_email: '', // optional email
-        same_as_whatsapp: true,
+        same_as_whatsapp: false,
         raw_text: '' 
     });
     const [parseAlert, setParseAlert] = useState('');
@@ -334,7 +334,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
             await axios.post('/api/jobs/create', payload, { headers: { Authorization: `Bearer ${token}` } });
             setSuccessMessage('Job published successfully to the Trainer Board!');
             setParsedData(null);
-            setFormData({ vendor_name: user?.name || '', contact_number: '', vendor_phone: user?.phone || '', vendor_email: user?.email || '', same_as_whatsapp: true, raw_text: '' });
+            setFormData({ vendor_name: user?.name || '', contact_number: '', vendor_phone: user?.phone || '', vendor_email: user?.email || '', same_as_whatsapp: false, raw_text: '' });
             setAppStep('input');
             fetchVendorHistory();
         } catch (error) {
@@ -634,25 +634,8 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
                                             onChange={(e) => setFormData({...formData, vendor_phone: e.target.value.replace(/\D/g, '')})}
                                         />
                                     </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-black text-zinc-900 mb-1.5">
-                                        Email <span className="text-zinc-400 font-bold">(optional)</span>
-                                    </label>
-                                    <input 
-                                        type="email"
-                                        placeholder="ops@company.in"
-                                        className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm font-bold text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all disabled:bg-zinc-50 disabled:text-zinc-500"
-                                        value={formData.vendor_email}
-                                        onChange={(e) => setFormData({...formData, vendor_email: e.target.value})}
-                                        disabled={!!user}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Switch Pill Toggle */}
-                            <div className="flex items-center gap-3 pt-1">
+                                    {/* Switch Pill Toggle */}
+                                    <div className="flex items-center gap-3 pt-2">
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -676,6 +659,22 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
                                 <span className="text-xs font-bold text-zinc-800">
                                     WhatsApp is the same as contact number
                                 </span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-black text-zinc-900 mb-1.5">
+                                        Email <span className="text-zinc-400 font-bold">(optional)</span>
+                                    </label>
+                                    <input 
+                                        type="email"
+                                        placeholder="ops@company.in"
+                                        className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm font-bold text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all disabled:bg-zinc-50 disabled:text-zinc-500"
+                                        value={formData.vendor_email}
+                                        onChange={(e) => setFormData({...formData, vendor_email: e.target.value})}
+                                        disabled={!!user}
+                                    />
+                                </div>
                             </div>
                         </div>
 

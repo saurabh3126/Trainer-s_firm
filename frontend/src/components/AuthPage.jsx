@@ -23,7 +23,7 @@ export default function AuthPage() {
 
     const [formData, setFormData] = useState({
         name: '', email: '', password: '', phone: '',
-        whatsapp_number: '', same_as_phone: true,
+        whatsapp_number: '', same_as_phone: false,
         personal_email: '',
         role: 'trainer', experience_years: '', resume_file: null,
         location: ''
@@ -196,6 +196,7 @@ export default function AuthPage() {
         setError('');
         setSuccessMsg('');
         setShowOtpInput(false);
+        setOtp('');
         setFormData({ ...formData, password: '', resume_file: null });
     };
 
@@ -431,9 +432,15 @@ export default function AuthPage() {
                                                 <div>
                                                     <label className={labelCls}>Experience (yrs)</label>
                                                     <input
-                                                        type="number" name="experience_years"
+                                                        type="number" name="experience_years" min="0" max="30"
                                                         placeholder="e.g. 5"
-                                                        value={formData.experience_years} onChange={handleChange}
+                                                        value={formData.experience_years} onChange={(e) => {
+                                                            let val = parseInt(e.target.value, 10);
+                                                            if (isNaN(val)) val = '';
+                                                            else if (val < 0) val = 0;
+                                                            else if (val > 30) val = 30;
+                                                            setFormData({ ...formData, experience_years: val });
+                                                        }}
                                                         className={getInputCls('unknown')}
                                                     />
                                                 </div>
