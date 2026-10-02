@@ -8,7 +8,7 @@ import GradualBlur from './GradualBlur';
 export default function LandingPage() {
     const { user } = useContext(AuthContext);
     const [liveJobs, setLiveJobs] = useState([]);
-    const [jobCount, setJobCount] = useState(14);
+    const [jobCount, setJobCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
