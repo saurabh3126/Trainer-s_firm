@@ -173,8 +173,24 @@ export default function TrainerBoard() {
         setLoading(false);
     };
 
-    const handleShare = (id) => {
+    const handleShare = async (id, subject) => {
         const url = `${window.location.origin}/job/${id}`;
+        const title = subject || 'Trainer Requirement';
+        
+        const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+        if (isMobile && navigator.share) {
+            try {
+                await navigator.share({
+                    title: title,
+                    text: `Check out this requirement on Trainer Firm: ${title}`,
+                    url: url,
+                });
+                return;
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+            }
+        }
+        
         navigator.clipboard.writeText(url);
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2500); 
