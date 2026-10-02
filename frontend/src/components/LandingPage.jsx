@@ -322,7 +322,7 @@ export default function LandingPage() {
                                     { num: '03', text: 'Connect directly with vendors' },
                                     { num: '04', text: 'High delivery application acceptance rate' }
                                 ].map((item) => (
-                                    <div key={item.num} className="p-4 bg-white border border-slate-200 shadow-xs rounded-xl flex items-center gap-4 hover:border-slate-300 transition-all">
+                                    <div key={item.num} className="p-4 bg-white border border-slate-200 shadow-xs rounded-xl flex items-center gap-4 hover:-translate-y-1 hover:shadow-md hover:border-slate-300 transition-all duration-300">
                                         <span className="text-xs font-mono font-bold text-slate-400">{item.num}</span>
                                         <span className="text-sm font-semibold text-slate-800">{item.text}</span>
                                     </div>
@@ -347,7 +347,7 @@ export default function LandingPage() {
                                     { num: '03', text: 'Review and publish clear requirements' },
                                     { num: '04', text: 'Fulfill directly with matched trainer credentials' }
                                 ].map((item) => (
-                                    <div key={item.num} className="p-4 bg-white border border-slate-200 shadow-xs rounded-xl flex items-center gap-4 hover:border-slate-300 transition-all">
+                                    <div key={item.num} className="p-4 bg-white border border-slate-200 shadow-xs rounded-xl flex items-center gap-4 hover:-translate-y-1 hover:shadow-md hover:border-slate-300 transition-all duration-300">
                                         <span className="text-xs font-mono font-bold text-slate-400">{item.num}</span>
                                         <span className="text-sm font-semibold text-slate-800">{item.text}</span>
                                     </div>
@@ -378,13 +378,13 @@ export default function LandingPage() {
                         { num: '03. PUBLISH', title: 'Live Listing', desc: 'Appears immediately on the trainer board with clean, structured parameters.' },
                         { num: '04. TRAIN', title: 'Direct Match', desc: 'Trainers review criteria and apply with resumes and contact profiles.' }
                     ].map((step, i) => (
-                        <div key={i} className="p-6 bg-white border-2 border-slate-300 rounded-2xl shadow-md hover:border-slate-400 hover:shadow-lg transition-all duration-300">
+                        <div key={i} className="p-6 bg-white border-2 border-slate-300 rounded-2xl shadow-md hover:-translate-y-2 hover:border-slate-400 hover:shadow-xl transition-all duration-300">
                             <div className="text-xs font-mono font-bold text-slate-400 mb-4">{step.num}</div>
                             <h4 className="text-sm font-bold text-black mb-1">{step.title}</h4>
                             <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
                         </div>
                     ))}
-                    <div className="p-6 bg-black text-white border-2 border-black rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                    <div className="p-6 bg-black text-white border-2 border-black rounded-2xl shadow-md hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
                         <div className="text-xs font-mono font-bold text-slate-400 mb-4">05. FULFILL</div>
                         <h4 className="text-sm font-bold text-white mb-1">Track & Close</h4>
                         <p className="text-xs text-slate-400 leading-relaxed">Record trainer credentials, mark complete, and maintain full record.</p>
