@@ -100,7 +100,7 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] font-sans text-zinc-900 flex flex-col relative">
-      <SplashCursor RAINBOW_MODE={false} COLOR="#10b981" />
+      <SplashCursor RAINBOW_MODE={false} COLOR="#27272a" />
       {!isAuth && <FloatingNavbar />}
       <main className="flex-grow overflow-hidden flex flex-col">
         <AnimatePresence mode="wait">
