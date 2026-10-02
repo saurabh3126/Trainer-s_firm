@@ -151,7 +151,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
 }
 
-/* Hover Popout & Revolving Border Effect */
+
 .card-revolve {
   border: 2px solid #e2e8f0;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.2s ease;
@@ -167,4 +167,34 @@ h1, h2, h3, h4, h5, h6 {
   background-origin: padding-box, border-box !important;
   background-clip: padding-box, border-box !important;
   animation: input-revolve 2.5s linear infinite !important;
+}
+/* High-Impact Moving Border Beam Animation */
+@keyframes border-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.moving-border-beam {
+  position: absolute;
+  inset: -160%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 260deg,
+    #10b981 310deg,
+    #000000 360deg
+  );
+  animation: border-spin 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.group:hover .moving-border-beam {
+  opacity: 1;
 }

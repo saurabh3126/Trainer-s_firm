@@ -287,10 +287,19 @@ export default function LandingPage() {
                         { num: '03', title: 'Direct coordination', desc: 'Immediate one-to-one WhatsApp coordination with pre-formatted requirements and direct candidate credentials.' },
                         { num: '04', title: 'Clear oversight', desc: 'Track open roles, applications, fulfillment, and responses in real time with transparent status logs.' }
                     ].map((feature, i) => (
-                        <div key={i} className="card-revolve p-8 bg-white rounded-2xl shadow-sm cursor-pointer">
-                            <div className="text-xs font-mono font-bold text-slate-400 mb-4">{feature.num}</div>
-                            <h3 className="text-lg font-bold text-black mb-2">{feature.title}</h3>
-                            <p className="text-sm text-slate-600 leading-relaxed">{feature.desc}</p>
+                        <div key={i} className="group relative p-[2px] rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] hover:scale-[1.01] cursor-pointer">
+                            {/* Continuous Moving Border Beam */}
+                            <div className="moving-border-beam" />
+                            {/* Static Border Fallback */}
+                            <div className="absolute inset-0 rounded-2xl border border-slate-200 group-hover:border-transparent transition-colors pointer-events-none" />
+                            {/* Card Content Surface */}
+                            <div className="relative bg-white rounded-[14px] p-8 h-full z-10 flex flex-col justify-between">
+                                <div>
+                                    <div className="text-xs font-mono font-bold text-slate-400 mb-4">{feature.num}</div>
+                                    <h3 className="text-lg font-bold text-black mb-2">{feature.title}</h3>
+                                    <p className="text-sm text-slate-600 leading-relaxed">{feature.desc}</p>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
