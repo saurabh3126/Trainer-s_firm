@@ -33,28 +33,28 @@ const PageTransition = ({ children }) => (
 // Shared footer used on all pages except /auth
 function SiteFooter() {
   return (
-    <footer className="bg-white border-t border-slate-200 pt-8 sm:pt-12 pb-6 text-slate-600 relative z-[100] flex-shrink-0">
+    <footer className="bg-white border-t border-slate-200 pt-5 sm:pt-12 pb-4 sm:pb-6 text-slate-600 relative z-[100] flex-shrink-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-8 mb-5 sm:mb-8">
 
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-1 flex flex-col">
-            <div className="flex items-center gap-2.5 mb-3">
-              <img src="/logo-mark.png" alt="TF" className="w-7 h-auto object-contain flex-shrink-0" />
+            <div className="flex items-center gap-2.5 mb-2 sm:mb-3">
+              <img src="/logo-mark.png" alt="TF" className="w-6 sm:w-7 h-auto object-contain flex-shrink-0" />
               <div className="w-[1px] h-5 bg-slate-300 rounded-full flex-shrink-0" />
               <div className="flex items-baseline pr-1 whitespace-nowrap">
-                <span className="text-[16px] font-black tracking-tight text-slate-900 leading-none">TRAINER</span>
-                <span className="text-[11px] font-bold tracking-normal text-slate-600 ml-[2.5px]">FIRM</span>
+                <span className="text-[15px] sm:text-[16px] font-black tracking-tight text-slate-900 leading-none">TRAINER</span>
+                <span className="text-[10px] sm:text-[11px] font-bold tracking-normal text-slate-600 ml-[2.5px]">FIRM</span>
               </div>
             </div>
-            <p className="text-xs leading-relaxed text-slate-500">
+            <p className="text-xs leading-relaxed text-slate-500 hidden sm:block">
               The reliable operating system for connecting corporate vendors with verified technical trainers.
             </p>
           </div>
 
           <div>
-            <h4 className="text-black font-bold mb-3 uppercase tracking-wider text-xs">Platform</h4>
-            <ul className="space-y-2 text-xs sm:text-sm">
+            <h4 className="text-black font-bold mb-2 sm:mb-3 uppercase tracking-wider text-[10px] sm:text-xs">Platform</h4>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs">
               <li><Link to="/trainers" className="hover:text-black transition-colors">Find Trainer Jobs</Link></li>
               <li><Link to="/vendor" className="hover:text-black transition-colors">Vendor Dashboard</Link></li>
               <li><Link to="/auth?mode=register" className="hover:text-black transition-colors">Create Account</Link></li>
@@ -62,31 +62,31 @@ function SiteFooter() {
           </div>
 
           <div>
-            <h4 className="text-black font-bold mb-3 uppercase tracking-wider text-xs">Legal</h4>
-            <ul className="space-y-2 text-xs sm:text-sm">
+            <h4 className="text-black font-bold mb-2 sm:mb-3 uppercase tracking-wider text-[10px] sm:text-xs">Legal</h4>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs">
               <li><Link to="/terms" className="hover:text-black transition-colors">Terms of Service</Link></li>
               <li><Link to="/privacy" className="hover:text-black transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/guidelines" className="hover:text-black transition-colors">Community Guidelines</Link></li>
+              <li><Link to="/guidelines" className="hover:text-black transition-colors">Guidelines</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-black font-bold mb-3 uppercase tracking-wider text-xs">Contact</h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm">
+            <h4 className="text-black font-bold mb-2 sm:mb-3 uppercase tracking-wider text-[10px] sm:text-xs">Contact</h4>
+            <ul className="space-y-1.5 sm:space-y-2.5 text-xs">
               <li className="flex items-start gap-2">
-                <Mail className="w-3.5 h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
+                <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
                 <a href="mailto:trainerfirm@outlook.com" className="hover:text-black transition-colors break-all">trainerfirm@outlook.com</a>
               </li>
               <li className="flex items-start gap-2">
-                <Phone className="w-3.5 h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
+                <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
                 <span className="text-slate-500">+91 70816 68450</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-slate-500">
+        <div className="pt-4 sm:pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-[10px] sm:text-xs text-slate-500">
             &copy; {new Date().getFullYear()} Trainer Firm. All rights reserved.
           </p>
         </div>
