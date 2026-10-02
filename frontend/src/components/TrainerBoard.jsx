@@ -197,7 +197,16 @@ export default function TrainerBoard() {
     };
 
     const handleFormChange = (e) => {
-        setContactForm({ ...contactForm, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === 'experience') {
+            let val = parseInt(value, 10);
+            if (isNaN(val)) val = '';
+            else if (val < 0) val = 0;
+            else if (val > 30) val = 30;
+            setContactForm({ ...contactForm, [name]: val });
+        } else {
+            setContactForm({ ...contactForm, [name]: value });
+        }
     };
 
     const closeContactModal = () => { 
@@ -867,7 +876,7 @@ export default function TrainerBoard() {
                                     <div className="relative">
                                         <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                         <input
-                                            type="number" name="experience"
+                                            type="number" name="experience" min="0" max="30"
                                             value={contactForm.experience} onChange={handleFormChange}
                                             disabled={user?.role === 'trainer'} placeholder="E.g., 5"
                                             className="w-full pl-9 pr-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all disabled:bg-zinc-50 disabled:text-zinc-500"
