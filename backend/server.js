@@ -575,6 +575,7 @@ const suggestionsCache = new Map();
 
 app.get('/api/jobs/ai-suggestions', async (req, res) => {
     try {
+        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=86400');
         const query = (req.query.q || '').trim();
         if (!query) {
             return res.json({ suggestions: POPULAR_SKILLS.slice(0, 10) });
@@ -654,6 +655,7 @@ const citySuggestionsCache = new Map();
 
 app.get('/api/jobs/city-suggestions', async (req, res) => {
     try {
+        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=86400');
         const query = (req.query.q || '').trim();
         if (!query) {
             return res.json({ suggestions: POPULAR_CITIES.slice(0, 10) });
@@ -757,6 +759,7 @@ app.put('/api/jobs/:id/fulfill', authenticate, async (req, res) => {
 app.get('/api/ping', (req, res) => res.json({pong: true}));
 app.get('/api/jobs', async (req, res) => {
     try {
+        res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=59');
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
