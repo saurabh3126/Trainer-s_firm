@@ -16,7 +16,7 @@ export default function Preloader({ onComplete }) {
 
   // Trigger exit after 2s
   useEffect(() => {
-    const t = setTimeout(() => setPhase('exit'), 2000);
+    const t = setTimeout(() => setPhase('exit'), 1500);
     return () => clearTimeout(t);
   }, []);
 
@@ -90,7 +90,7 @@ export default function Preloader({ onComplete }) {
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(90deg, #10b981, #6ee7b7, #10b981)',
+            background: 'linear-gradient(90deg, #0a0a0a, #525252, #0a0a0a)',
             backgroundSize: '200% 100%',
             borderRadius: 2,
             animation: 'pl-bar 2s cubic-bezier(0.4,0,0.2,1) forwards, pl-shimmer 1.2s ease infinite',
