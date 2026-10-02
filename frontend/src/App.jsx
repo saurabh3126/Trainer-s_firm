@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import Preloader from './components/Preloader.jsx';
 import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Mail, Phone, MapPin } from 'lucide-react';
@@ -159,9 +160,20 @@ function AppLayout() {
 }
 
 function App() {
+  const [ready, setReady] = useState(false);
+
   return (
     <BrowserRouter>
-      <AppLayout />
+      {!ready && <Preloader onComplete={() => setReady(true)} />}
+      <div
+        style={{
+          opacity: ready ? 1 : 0,
+          transition: 'opacity 0.4s ease',
+          visibility: ready ? 'visible' : 'hidden',
+        }}
+      >
+        <AppLayout />
+      </div>
     </BrowserRouter>
   );
 }
