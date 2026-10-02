@@ -233,7 +233,11 @@ export default function TrainerBoard() {
             if (res.data.success) {
                 const cleanVendorPhone = res.data.vendor_contact_value.replace(/\D/g, '').slice(-10);
                 const encodedMsg = encodeURIComponent(res.data.pre_filled_message);
-                window.open(`https://wa.me/91${cleanVendorPhone}?text=${encodedMsg}`, '_blank');
+                const waUrl = `https://wa.me/91${cleanVendorPhone}?text=${encodedMsg}`;
+                const newWin = window.open(waUrl, '_blank');
+                if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
+                    window.location.href = waUrl;
+                }
                 closeContactModal();
             }
         } catch (error) {

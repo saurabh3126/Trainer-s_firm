@@ -804,7 +804,7 @@ app.post('/api/jobs/contact', async (req, res) => {
             } catch (e) { /* Ignore */ }
         }
 
-        let preFilledMessage = `Hello ${job.vendor_id.name},\n\nI am reaching out regarding your requirement for "${job.subject}" on Trainer Firm.\n\nMy name is ${trainer_name} and my contact number is ${trainer_contact}.`;
+        let preFilledMessage = `Hi,\n\nI am reaching out regarding your requirement for "${job.subject}" on Trainer Firm.\n\nMy name is ${trainer_name} and my contact number is ${trainer_contact}.`;
 
         if (experience) preFilledMessage += `\nI have ${experience} years of experience in this domain.`;
         if (resume_link) preFilledMessage += `\nYou can review my resume and previous work here: ${resume_link}`;
