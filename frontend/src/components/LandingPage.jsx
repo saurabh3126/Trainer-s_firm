@@ -72,7 +72,7 @@ export default function LandingPage() {
     const displayJobs = liveJobs.length > 0 ? liveJobs : defaultSampleJobs;
 
     return (
-        <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-black selection:text-white relative">
+        <div className="min-h-screen bg-transparent text-slate-900 font-sans selection:bg-black selection:text-white relative">
             
             {/* HERO SECTION */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 md:pt-8 md:pb-16 relative z-10">
@@ -306,7 +306,7 @@ export default function LandingPage() {
             </section>
 
             {/* DUAL COMPARISON */}
-            <section className="bg-[#FAFAFA] border-y border-slate-200 py-20 md:py-28 relative z-10">
+            <section className="bg-transparent border-y border-slate-200 py-20 md:py-28 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
                         

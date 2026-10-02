@@ -204,7 +204,7 @@ export default function AuthPage() {
     const labelCls = "block text-[11px] font-bold text-zinc-800 mb-1.5";
 
     return (
-        <div className="flex min-h-screen bg-[#f7f7f8] font-sans overflow-hidden">
+        <div className="flex min-h-screen bg-transparent font-sans overflow-hidden">
             
             {/* Left Black Section */}
             <div className="hidden lg:flex lg:w-[480px] xl:w-[500px] bg-[#0b0b0b] flex-col justify-between p-10 relative z-[100] border-r border-zinc-800">

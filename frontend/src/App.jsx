@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-do
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import LandingPage from './components/LandingPage.jsx';
-import SplashCursor from './components/SplashCursor.jsx';
 import MoltenMetal from './components/MoltenMetal.jsx';
 import FloatingNavbar from './components/FloatingNavbar.jsx';
 import VendorDashboard from './components/VendorDashboard.jsx';
@@ -111,8 +110,7 @@ function AppLayout() {
           opacity={0.8}
         />
       </div>
-      <SplashCursor RAINBOW_MODE={false} COLOR="#ffffff" />
-      {!isAuth && <FloatingNavbar />}
+            {!isAuth && <FloatingNavbar />}
       <main className="flex-grow overflow-hidden flex flex-col">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
