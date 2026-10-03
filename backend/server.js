@@ -28,10 +28,13 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.set('trust proxy', 1);
+
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 15,
-    message: { error: 'Too many requests from this IP, please try again after 15 minutes' }
+    message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
+    validate: false
 });
 app.use('/api/auth', authLimiter);
 
@@ -151,9 +154,9 @@ const Interaction = mongoose.model('Interaction', interactionSchema);
 // 3. MIDDLEWARE & EMAIL TRANSPORTER
 // ==========================================
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: process.env.EMAIL_PORT || 465,
-    secure: process.env.EMAIL_PORT == 587 ? false : true,
+    host: process.env.EMAIL_HOST || 'smtp.titan.email',
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    secure: false, // false for port 587 (STARTTLS)
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_APP_PASSWORD
@@ -1022,5 +1025,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
+
 
 
