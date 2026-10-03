@@ -36,6 +36,9 @@ export default function TermsOfService() {
                     <h2 className="text-lg font-bold text-black mt-8 mb-4">Liability</h2>
                     <p>TrainerFirm isn't liable for any dispute, loss, or issue arising from an engagement you enter into through the platform. Use the platform at your own discretion.</p>
 
+                    <h2 className="text-lg font-bold text-black mt-8 mb-4">Intellectual Property</h2>
+                    <p>The TrainerFirm name, logo, visual design, and website content are the intellectual property of TrainerFirm and its operators. These assets may not be copied, reproduced, or reused without prior written consent.</p>
+
                     <h2 className="text-lg font-bold text-black mt-8 mb-4">Changes</h2>
                     <p>We may update these terms as TrainerFirm grows. We'll keep this page current, so check back if anything seems to have changed.</p>
                 </div>

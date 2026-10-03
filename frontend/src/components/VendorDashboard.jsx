@@ -579,7 +579,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
                                         className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-sm font-bold text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 transition-all disabled:bg-zinc-50 disabled:text-zinc-500 ${parseErrors.vendor_name ? 'border-red-500 ring-red-500 text-red-900' : 'border-zinc-200 focus:ring-zinc-900 focus:border-zinc-900'}`}
                                         value={formData.vendor_name}
                                         onChange={(e) => setFormData({...formData, vendor_name: e.target.value})}
-                                        disabled={!!user}
+                                        disabled={!!user && user.role !== 'admin'}
                                     />
                                 </div>
 
@@ -607,7 +607,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
                                                     setFormData({...formData, contact_number: val});
                                                 }
                                             }}
-                                            disabled={!!user}
+                                            disabled={!!user && user.role !== 'admin'}
                                         />
                                     </div>
                                 </div>
@@ -672,7 +672,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
                                         className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm font-bold text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all disabled:bg-zinc-50 disabled:text-zinc-500"
                                         value={formData.vendor_email}
                                         onChange={(e) => setFormData({...formData, vendor_email: e.target.value})}
-                                        disabled={!!user}
+                                        disabled={!!user && user.role !== 'admin'}
                                     />
                                 </div>
                             </div>
@@ -1183,9 +1183,16 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
                                             className="bg-white p-3.5 rounded-xl border border-zinc-200 shadow-md space-y-2 group hover:border-zinc-600 transition-colors"
                                         >
                                             <div className="flex items-center justify-between">
-                                                <h4 className="text-xs font-black text-zinc-900 truncate max-w-[200px]">
-                                                    {job.subject}
-                                                </h4>
+                                                <div className="flex flex-col max-w-[200px]">
+                                                    <h4 className="text-xs font-black text-zinc-900 truncate">
+                                                        {job.subject}
+                                                    </h4>
+                                                    {user?.role === 'admin' && (
+                                                        <span className="text-[10px] font-semibold text-zinc-500 truncate mt-0.5">
+                                                            Vendor: {job.vendor_id?.name || 'Unknown'}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border border-black ${
                                                     job.status === 'open' ? 'bg-emerald-100 text-emerald-900' :
                                                     job.status === 'fulfilled' ? 'bg-zinc-200 text-zinc-900' :
@@ -1527,6 +1534,11 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
                             <h2 className="text-2xl font-black text-zinc-900 mb-2 leading-tight">
                                 {selectedJob.subject}
                             </h2>
+                            {user?.role === 'admin' && (
+                                <p className="text-sm font-bold text-zinc-700 mb-1">
+                                    Posted for: {selectedJob.vendor_id?.name || 'Unknown'} ({selectedJob.vendor_id?.phone || 'No phone'})
+                                </p>
+                            )}
                             <p className="text-xs text-zinc-500 font-medium">
                                 Posted on {new Date(selectedJob.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </p>

@@ -39,37 +39,7 @@ export default function LandingPage() {
         }
     };
 
-    const defaultSampleJobs = [
-        {
-            _id: 'sample-1',
-            mode: 'onsite',
-            subject: 'Senior AWS Trainer',
-            city: 'Bangalore',
-            duration: '5 days',
-            pay_disclosed: '45000/day',
-            createdAt: new Date().toISOString()
-        },
-        {
-            _id: 'sample-2',
-            mode: 'hybrid',
-            subject: 'React + TypeScript Instructor',
-            city: 'Hyderabad',
-            duration: '3 weeks',
-            pay_disclosed: '90000/month',
-            createdAt: new Date(Date.now() - 86400000).toISOString()
-        },
-        {
-            _id: 'sample-3',
-            mode: 'remote',
-            subject: 'Azure Data Factory SME',
-            city: 'Anywhere',
-            duration: '10 days',
-            pay_disclosed: '60000',
-            createdAt: new Date(Date.now() - 172800000).toISOString()
-        }
-    ];
-
-    const displayJobs = liveJobs.length > 0 ? liveJobs : defaultSampleJobs;
+    const displayJobs = liveJobs;
 
     return (
         <div className="min-h-screen bg-transparent text-slate-900 font-sans selection:bg-black selection:text-white relative">
@@ -182,6 +152,10 @@ export default function LandingPage() {
                                                 </div>
                                             </div>
                                         ))
+                                    ) : displayJobs.length === 0 ? (
+                                        <div className="text-sm text-slate-500 text-center py-6 border border-dashed border-slate-300 rounded-xl bg-slate-50">
+                                            No active requirements at the moment.
+                                        </div>
                                     ) : (
                                         displayJobs.map((job, idx) => (
                                             <Link 
