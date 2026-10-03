@@ -75,7 +75,7 @@ function SiteFooter() {
             <ul className="space-y-1.5 sm:space-y-2.5 text-xs">
               <li className="flex items-start gap-2">
                 <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
-                <a href="mailto:trainerfirm@outlook.com" className="hover:text-black transition-colors break-all">trainerfirm@outlook.com</a>
+                <a href="mailto:support@trainerfirm.com" className="hover:text-black transition-colors break-all">support@trainerfirm.com</a>
               </li>
               <li className="flex items-start gap-2">
                 <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 mt-0.5 text-slate-800 flex-shrink-0" />
