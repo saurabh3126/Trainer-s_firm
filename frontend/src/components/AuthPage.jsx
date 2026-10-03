@@ -495,7 +495,7 @@ export default function AuthPage() {
                                                     <label className={`flex flex-col items-center justify-center w-full py-2.5 bg-zinc-50 border border-dashed rounded-lg cursor-pointer hover:bg-zinc-100 transition-colors ${fieldErrors.resume_file ? 'border-red-500 bg-red-50/50' : 'border-zinc-300'}`}>
                                                         <span className="text-[10px] font-bold text-zinc-900">Upload Resume</span>
                                                         <input
-                                                            type="file" accept=".pdf,.doc,.docx" required
+                                                            type="file" accept=".pdf,.doc,.docx"
                                                             onChange={(e) => setFormData({ ...formData, resume_file: e.target.files[0] })}
                                                             className="hidden"
                                                         />
