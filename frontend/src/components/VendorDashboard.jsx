@@ -229,7 +229,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
     const handleDeleteJob = async (jobId) => {
         if (!window.confirm("Are you sure you want to delete this job permanently?")) return;
         try {
-            await axios.delete(/api/jobs/);
+            await axios.delete(`/api/jobs/${jobId}`);
             setJobHistory(jobHistory.filter(j => j._id !== jobId));
             if (selectedJob && selectedJob._id === jobId) setSelectedJob(null);
             alert("Job deleted successfully");
@@ -238,7 +238,8 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
             alert("Failed to delete job");
         }
     };
-\n    const handleDeleteDraft = (id, e) => {
+
+    const handleDeleteDraft = (id, e) => {
         e.stopPropagation();
         const updated = drafts.filter(d => d.id !== id);
         setDrafts(updated);
@@ -1741,6 +1742,8 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
         </div>
     );
 }
+
+
 
 
 

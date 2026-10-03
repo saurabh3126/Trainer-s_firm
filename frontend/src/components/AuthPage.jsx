@@ -97,7 +97,8 @@ export default function AuthPage() {
             setError(err.response?.data?.error || 'Failed to reset password');
         } finally { setLoading(false); }
     };
-\n    const handleChange = (e) => {
+
+    const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -276,7 +277,8 @@ export default function AuthPage() {
                 </div>
             );
         }
-\n    return (
+
+    return (
         <div className="flex min-h-screen bg-transparent font-sans overflow-hidden">
             
             {/* Left Black Section */}
@@ -646,3 +648,6 @@ export default function AuthPage() {
         </div>
     );
 }
+
+
+
