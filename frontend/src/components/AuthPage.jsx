@@ -13,6 +13,12 @@ export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(mode !== 'register' && mode !== 'signup');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
+    const [forgotStep, setForgotStep] = useState(1);
+    const [forgotEmail, setForgotEmail] = useState('');
+    const [forgotOtp, setForgotOtp] = useState('');
+    const [forgotNewPassword, setForgotNewPassword] = useState('');
+
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
 
@@ -65,7 +71,33 @@ export default function AuthPage() {
         }
     }, [formData.password, formData.email, isLogin]);
 
-    const handleChange = (e) => {
+    
+    const handleForgotSendOtp = async (e) => {
+        e.preventDefault();
+        setLoading(true); setError('');
+        try {
+            const res = await axios.post('/api/auth/forgot-password', { email: forgotEmail });
+            setSuccessMsg(res.data.message);
+            setForgotStep(2);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to send OTP');
+        } finally { setLoading(false); }
+    };
+
+    const handleForgotReset = async (e) => {
+        e.preventDefault();
+        setLoading(true); setError('');
+        try {
+            const res = await axios.post('/api/auth/reset-password', { email: forgotEmail, otp: forgotOtp, newPassword: forgotNewPassword });
+            setSuccessMsg(res.data.message);
+            setForgotPasswordMode(false);
+            setForgotStep(1);
+            setIsLogin(true);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to reset password');
+        } finally { setLoading(false); }
+    };
+\n    const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -203,7 +235,48 @@ export default function AuthPage() {
     const getInputCls = (name) => `w-full px-3 py-2.5 bg-white border rounded-lg text-[13px] font-medium placeholder-zinc-400 focus:outline-none focus:ring-1 transition-all ${fieldErrors[name] ? 'border-red-500 ring-red-500 text-red-900' : 'border-zinc-200 focus:border-black focus:ring-black'}`;
     const labelCls = "block text-[11px] font-bold text-zinc-800 mb-1.5";
 
-    return (
+    
+        if (forgotPasswordMode) {
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+                    <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
+                        <button onClick={() => setForgotPasswordMode(false)} className="flex items-center text-sm text-gray-500 mb-6 hover:text-black">
+                            <ArrowLeft className="w-4 h-4 mr-1" /> Back to Login
+                        </button>
+                        <h2 className="text-2xl font-black mb-6 text-center">Reset Password</h2>
+                        {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded mb-4">{error}</div>}
+                        {successMsg && <div className="p-3 bg-green-50 text-green-600 text-sm rounded mb-4">{successMsg}</div>}
+                        
+                        {forgotStep === 1 ? (
+                            <form onSubmit={handleForgotSendOtp} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold mb-1">Email</label>
+                                    <input type="email" required className="w-full border p-3 rounded" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} />
+                                </div>
+                                <button type="submit" disabled={loading} className="w-full bg-black text-white p-3 rounded font-bold hover:bg-gray-800 flex justify-center">
+                                    {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Send OTP'}
+                                </button>
+                            </form>
+                        ) : (
+                            <form onSubmit={handleForgotReset} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold mb-1">Enter OTP</label>
+                                    <input type="text" required className="w-full border p-3 rounded text-center tracking-widest text-xl" value={forgotOtp} onChange={e => setForgotOtp(e.target.value)} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold mb-1">New Password</label>
+                                    <input type="password" required minLength={6} className="w-full border p-3 rounded" value={forgotNewPassword} onChange={e => setForgotNewPassword(e.target.value)} />
+                                </div>
+                                <button type="submit" disabled={loading} className="w-full bg-black text-white p-3 rounded font-bold hover:bg-gray-800 flex justify-center">
+                                    {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Reset Password'}
+                                </button>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+\n    return (
         <div className="flex min-h-screen bg-transparent font-sans overflow-hidden">
             
             {/* Left Black Section */}

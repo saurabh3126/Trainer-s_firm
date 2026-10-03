@@ -418,6 +418,53 @@ app.post('/api/auth/admin-login', async (req, res) => {
     }
 });
 
+
+// Forgot Password Flow
+app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await OTP.findOneAndUpdate(
+            { email },
+            { otp: otpCode, mc_verification_id: 'forgot_password_flow' },
+            { upsert: true, new: true }
+        );
+
+        const mailOptions = {
+            from: "Trainer Firm Support" <${process.env.EMAIL_USER}>,
+            to: email,
+            subject: 'Password Reset OTP',
+            html: <p>Your password reset code is: <strong> + otpCode + </strong></p>
+        };
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ success: true, message: 'OTP sent to email' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to send OTP' });
+    }
+});
+
+app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const otpRecord = await OTP.findOne({ email, otp });
+        if (!otpRecord) return res.status(400).json({ error: 'Invalid or expired OTP' });
+
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        await OTP.deleteOne({ email });
+
+        res.status(200).json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to reset password' });
+    }
+});
+
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -1025,6 +1072,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
