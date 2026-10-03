@@ -32,7 +32,7 @@ app.set('trust proxy', 1);
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
-    max: 15,
+    max: 100,
     message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
     validate: false
 });
@@ -1025,6 +1025,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
