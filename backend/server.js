@@ -151,7 +151,9 @@ const Interaction = mongoose.model('Interaction', interactionSchema);
 // 3. MIDDLEWARE & EMAIL TRANSPORTER
 // ==========================================
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: process.env.EMAIL_PORT || 465,
+    secure: process.env.EMAIL_PORT == 587 ? false : true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_APP_PASSWORD
