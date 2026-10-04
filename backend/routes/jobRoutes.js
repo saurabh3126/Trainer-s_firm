@@ -176,7 +176,7 @@ router.post('/contact', async (req, res) => {
 });
 
 // Route: PUT /api/jobs/:id (Edit Job)
-app.put('/api/jobs/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const job = await JobPost.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
@@ -187,7 +187,7 @@ app.put('/api/jobs/:id', async (req, res) => {
 });
 
 // Route: DELETE /api/jobs/:id (Delete Job)
-app.delete('/api/jobs/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const job = await JobPost.findByIdAndDelete(req.params.id);
         if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
