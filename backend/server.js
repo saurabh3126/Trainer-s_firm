@@ -434,10 +434,10 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         );
 
         const mailOptions = {
-            from: "Trainer Firm Support" <${process.env.EMAIL_USER}>,
+            from: `"Trainer Firm Support" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: 'Password Reset OTP',
-            html: <p>Your password reset code is: <strong> + otpCode + </strong></p>
+            html: `<p>Your password reset code is: <strong>${otpCode}</strong></p>`
         };
         await transporter.sendMail(mailOptions);
         res.status(200).json({ success: true, message: 'OTP sent to email' });
