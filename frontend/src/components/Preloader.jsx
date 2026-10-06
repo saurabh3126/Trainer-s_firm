@@ -76,10 +76,11 @@ export default function Preloader({ onComplete }) {
               transition: 'color 0.3s ease',
               fontFamily: 'sans-serif',
               lineHeight: 1,
-              marginLeft: letter === ' ' ? 4 : 0,
+              marginLeft: letter === ' ' ? 0 : 0,
+              width: letter === ' ' ? 8 : 'auto',
             }}
           >
-            {letter === ' ' ? '\u00a0' : letter}
+            {letter === ' ' ? '' : letter}
           </span>
         ))}
       </div>
