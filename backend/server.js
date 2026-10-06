@@ -245,7 +245,7 @@ app.post('/api/auth/send-otp', async (req, res) => {
         
         const existingUser = await User.findOne({ $or: orQuery });
         if (existingUser) {
-            if (email && existingUser.email === email && !email.endsWith('@no-email.venty.in'))
+            if (email && existingUser.email === email && !email.endsWith('@no-email.venty.in') && !email.endsWith('@no-email.trainerfirm.com'))
                 return res.status(400).json({ error: 'Email is already registered. Please log in.' });
             if (phone && existingUser.phone === phone)
                 return res.status(400).json({ error: 'Phone number is already registered. Please log in.' });
@@ -376,7 +376,7 @@ app.post('/api/auth/register', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const finalEmail = email && email.trim() ? email.trim() : `${phone}@no-email.venty.in`;
+        const finalEmail = email && email.trim() ? email.trim() : `${phone}@no-email.trainerfirm.com`;
         await User.create({
             name,
             email: finalEmail,
@@ -542,7 +542,8 @@ app.post('/api/auth/login', async (req, res) => {
             $or: [
                 { email: identifier },
                 { phone: identifier },
-                { email: `${identifier}@no-email.venty.in` }
+                { email: `${identifier}@no-email.venty.in` },
+                { email: `${identifier}@no-email.trainerfirm.com` }
             ]
         });
         if (!user) return res.status(404).json({ error: 'User not found. Please check your details.' });
@@ -1004,10 +1005,22 @@ app.post('/api/jobs/contact', async (req, res) => {
 // ==========================================
 app.put('/api/users/profile', authenticate, async (req, res) => {
     try {
-        const { name, phone, experience_years, resume_link, resume_public_id, profile_photo, profile_photo_public_id, location, skills } = req.body;
+        const { name, email, phone, experience_years, resume_link, resume_public_id, profile_photo, profile_photo_public_id, location, skills } = req.body;
         
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ error: "User not found" });
+
+        if (email && email !== user.email) {
+            const existingEmail = await User.findOne({ email });
+            if (existingEmail) return res.status(400).json({ error: "Email is already in use by another account." });
+            user.email = email;
+        }
+
+        if (phone && phone !== user.phone) {
+            const existingPhone = await User.findOne({ phone });
+            if (existingPhone) return res.status(400).json({ error: "Phone number is already in use by another account." });
+            user.phone = phone;
+        }
 
         if (resume_public_id && user.resume_public_id && user.resume_public_id !== resume_public_id) {
             await cloudinary.uploader.destroy(user.resume_public_id);
@@ -1018,7 +1031,6 @@ app.put('/api/users/profile', authenticate, async (req, res) => {
         }
 
         user.name = name || user.name;
-        user.phone = phone || user.phone;
         if (location !== undefined) user.location = location;
         if (skills !== undefined) user.skills = skills;
         
