@@ -422,34 +422,101 @@ app.post('/api/auth/admin-login', async (req, res) => {
 // Forgot Password Flow
 app.post('/api/auth/forgot-password', async (req, res) => {
     try {
-        const { email } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        const { contact } = req.body;
+        
+        // Find user by either email or phone
+        const user = await User.findOne({ 
+            $or: [{ email: contact }, { phone: contact }] 
+        });
+        if (!user) return res.status(404).json({ error: 'User not found with that email or phone' });
 
-        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-        await OTP.findOneAndUpdate(
-            { email },
-            { otp: otpCode, mc_verification_id: 'forgot_password_flow' },
-            { upsert: true, new: true }
-        );
+        const isPhone = /^[0-9]+$/.test(contact);
 
-        const mailOptions = {
-            from: `"Trainer Firm Support" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: 'Password Reset OTP',
-            html: `<p>Your password reset code is: <strong>${otpCode}</strong></p>`
-        };
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ success: true, message: 'OTP sent to email' });
+        if (isPhone) {
+            try {
+                const mcToken = await getMCToken();
+                const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', {
+                    countryCode: '91',
+                    customerId: process.env.MC_CUSTOMER_ID,
+                    flowType: 'SMS',
+                    mobileNumber: contact
+                }, { headers: { authToken: mcToken }, timeout: 8000 });
+                
+                const vId = otpRes.data?.data?.verificationId;
+                if (!vId) throw new Error("Failed to get verification ID from SMS provider.");
+                
+                await OTP.findOneAndUpdate(
+                    { email: contact },
+                    { otp: vId, mc_verification_id: 'forgot_password_flow' },
+                    { upsert: true, new: true }
+                );
+                return res.status(200).json({ success: true, message: 'OTP sent to mobile' });
+            } catch (err) {
+                console.error("SMS Send Error:", err?.response?.data || err.message);
+                return res.status(500).json({ error: 'Failed to send SMS OTP' });
+            }
+        } else {
+            const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+            await OTP.findOneAndUpdate(
+                { email: contact },
+                { otp: otpCode, mc_verification_id: 'forgot_password_flow' },
+                { upsert: true, new: true }
+            );
+
+            const mailOptions = {
+                from: `"Trainer Firm Support" <${process.env.EMAIL_USER}>`,
+                to: contact,
+                subject: 'Password Reset OTP',
+                html: `<p>Your password reset code is: <strong>${otpCode}</strong></p>`
+            };
+            await transporter.sendMail(mailOptions);
+            return res.status(200).json({ success: true, message: 'OTP sent to email' });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to send OTP' });
+        console.error("Forgot Password Error:", error);
+        res.status(500).json({ error: 'Failed to process request' });
     }
 });
 
 app.post('/api/auth/reset-password', async (req, res) => {
     try {
-        const { email, otp, newPassword } = req.body;
-        const otpRecord = await OTP.findOne({ email, otp });
+        const { contact, otp, newPassword } = req.body;
+        
+        const otpRecord = await OTP.findOne({ email: contact });
+        if (!otpRecord) return res.status(400).json({ error: 'No active OTP session found.' });
+
+        const isPhone = /^[0-9]+$/.test(contact);
+        
+        if (isPhone) {
+            try {
+                const mcToken = await getMCToken();
+                await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
+                    params: { verificationId: otpRecord.otp, code: otp, customerId: process.env.MC_CUSTOMER_ID },
+                    headers: { authToken: mcToken },
+                    timeout: 8000
+                });
+            } catch (mcErr) {
+                return res.status(400).json({ error: 'Invalid or expired OTP.' });
+            }
+        } else {
+            if (otpRecord.otp !== otp) {
+                return res.status(400).json({ error: 'Invalid or expired OTP.' });
+            }
+        }
+
+        const user = await User.findOne({ $or: [{ email: contact }, { phone: contact }] });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        await OTP.deleteOne({ _id: otpRecord._id });
+
+        res.status(200).json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        console.error("Reset Password Error:", error);
+        res.status(500).json({ error: 'Failed to reset password' });
+    }
+});
         if (!otpRecord) return res.status(400).json({ error: 'Invalid or expired OTP' });
 
         const user = await User.findOne({ email });

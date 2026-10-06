@@ -15,7 +15,7 @@ export default function AuthPage() {
     const [loading, setLoading] = useState(false);
     const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
     const [forgotStep, setForgotStep] = useState(1);
-    const [forgotEmail, setForgotEmail] = useState('');
+    const [forgotContact, setForgotContact] = useState('');
     const [forgotOtp, setForgotOtp] = useState('');
     const [forgotNewPassword, setForgotNewPassword] = useState('');
 
@@ -76,7 +76,7 @@ export default function AuthPage() {
         e.preventDefault();
         setLoading(true); setError('');
         try {
-            const res = await axios.post('/api/auth/forgot-password', { email: forgotEmail });
+            const res = await axios.post('/api/auth/forgot-password', { contact: forgotContact });
             setSuccessMsg(res.data.message);
             setForgotStep(2);
         } catch (err) {
@@ -88,7 +88,7 @@ export default function AuthPage() {
         e.preventDefault();
         setLoading(true); setError('');
         try {
-            const res = await axios.post('/api/auth/reset-password', { email: forgotEmail, otp: forgotOtp, newPassword: forgotNewPassword });
+            const res = await axios.post('/api/auth/reset-password', { contact: forgotContact, otp: forgotOtp, newPassword: forgotNewPassword });
             setSuccessMsg(res.data.message);
             setForgotPasswordMode(false);
             setForgotStep(1);
@@ -283,7 +283,7 @@ export default function AuthPage() {
                                 </button>
                                 <div className="mb-6 text-center">
                                     <h2 className="text-2xl font-black text-black tracking-tight mb-1">Reset Password.</h2>
-                                    <p className="text-[11px] text-zinc-500 font-medium">Enter email to receive code.</p>
+                                    <p className="text-[11px] text-zinc-500 font-medium">Enter email or phone to receive code.</p>
                                 </div>
                                 
                                 {error && (
@@ -302,8 +302,8 @@ export default function AuthPage() {
                                 {forgotStep === 1 ? (
                                     <form onSubmit={handleForgotSendOtp} className="space-y-4">
                                         <div>
-                                            <label className={labelCls}>Email Address</label>
-                                            <input type="email" required className={getInputCls('email')} value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} placeholder="name@example.com" />
+                                            <label className={labelCls}>Email or Phone</label>
+                                            <input type="text" required className={getInputCls('email')} value={forgotContact} onChange={e => setForgotContact(e.target.value)} placeholder="email@example.com or 9876543210" />
                                         </div>
                                         <div className="pt-2">
                                             <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
