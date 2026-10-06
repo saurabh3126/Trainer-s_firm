@@ -1,5 +1,6 @@
 import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { Loader2, Lock, KeyRound, CheckCircle, XCircle, Eye, BadgeCheck, X } from 'lucide-react';
@@ -12,9 +13,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     
     // Login state
-    const [adminPass, setAdminPass] = useState('');
-    const [loginLoading, setLoginLoading] = useState(false);
-    const [loginError, setLoginError] = useState('');
+
 
     const [activeTab, setActiveTab] = useState('open_jobs');
     const [selectedJob, setSelectedJob] = useState(null);
