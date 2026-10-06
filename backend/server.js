@@ -517,20 +517,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
         res.status(500).json({ error: 'Failed to reset password' });
     }
 });
-        if (!otpRecord) return res.status(400).json({ error: 'Invalid or expired OTP' });
-
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ error: 'User not found' });
-
-        user.password = await bcrypt.hash(newPassword, 10);
-        await user.save();
-        await OTP.deleteOne({ email });
-
-        res.status(200).json({ success: true, message: 'Password reset successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to reset password' });
-    }
-});
 
 app.post('/api/auth/login', async (req, res) => {
     try {
