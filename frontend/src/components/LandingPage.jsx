@@ -87,43 +87,6 @@ export default function LandingPage() {
 
                     {/* Right Column - BLACK OUTER CARD */}
                     <div className="lg:col-span-5 relative z-20">
-                        {user?.role === 'vendor' ? (
-                            <div className="bg-black border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.4)] transition-all duration-300 space-y-5">
-                                <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-800 text-white flex items-center justify-center shadow-inner flex-shrink-0">
-                                        <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M8 5V3.5C8 2.67157 8.67157 2 9.5 2H19.5C20.3284 2 21 2.67157 21 3.5V13.5C21 14.3284 20.3284 15 19.5 15H18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" opacity="0.6"/>
-                                            <rect x="3.5" y="5.5" width="14" height="15" rx="2.5" fill="currentColor" stroke="currentColor" strokeWidth="1.8"/>
-                                            <path d="M7 9.5H14" stroke="#0f172a" strokeWidth="2" strokeLinecap="round"/>
-                                            <path d="M10.5 9.5V16" stroke="#0f172a" strokeWidth="2" strokeLinecap="round"/>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">Vendor Portal</span>
-                                        <h3 className="text-base font-black text-white">TRAINER FIRM Workspace</h3>
-                                    </div>
-                                </div>
-
-                                <p className="text-sm text-slate-400 leading-relaxed">
-                                    You are logged in as a <strong>Vendor</strong>. Create corporate training requirements, manage active postings, and connect with qualified trainers directly.
-                                </p>
-
-                                <div className="space-y-3 pt-2">
-                                    <Link
-                                        to="/vendor"
-                                        className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-white text-black rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-200 transition-all shadow-[0_4px_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5"
-                                    >
-                                        Post New Requirement <ArrowRight className="w-4 h-4" />
-                                    </Link>
-                                    <Link
-                                        to="/profile?tab=posted"
-                                        className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 border border-slate-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all"
-                                    >
-                                        View My Posted Requirements
-                                    </Link>
-                                </div>
-                            </div>
-                        ) : (
                             <div className="bg-black border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.5)] transition-all duration-300 relative overflow-hidden">
                                 
                                 <div className="flex items-center justify-between pb-4 border-b border-slate-800 relative z-10">
@@ -234,7 +197,7 @@ export default function LandingPage() {
                                     </Link>
                                 </div>
                             </div>
-                        )}
+                        
                     </div>
 
                 </div>

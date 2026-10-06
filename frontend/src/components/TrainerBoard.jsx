@@ -30,13 +30,6 @@ export default function TrainerBoard() {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    // Do not show trainer feed to vendors
-    useEffect(() => {
-        if (user && user.role === 'vendor') {
-            navigate('/vendor', { replace: true });
-        }
-    }, [user, navigate]);
-
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [copiedId, setCopiedId] = useState(null);
@@ -295,10 +288,7 @@ export default function TrainerBoard() {
     });
 
     const hasActiveFilters = filterMode !== 'All' || filterCity !== 'All' || filterTech !== 'All' || salarySlider > 0;
-
-    if (user && user.role === 'vendor') return null;
-
-    if (loading) return <div className="flex justify-center mt-32"><Loader /></div>;
+if (loading) return <div className="flex justify-center mt-32"><Loader /></div>;
 
     const getStatusBadge = (job) => {
         const created = new Date(job.createdAt);
@@ -740,12 +730,14 @@ export default function TrainerBoard() {
                                                     VIEW DETAILS
                                                 </button>
                                             </div>
-                                            <button
-                                                onClick={() => { setSelectedJob(job); setAlertMsg({ text: '', type: '' }); }}
-                                                className="px-3 py-1.5 bg-black hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold transition-all tracking-wide"
-                                            >
-                                                WHATSAPP APPLY
-                                            </button>
+                                            {user?.role !== 'vendor' && (
+                                                <button
+                                                    onClick={() => { setSelectedJob(job); setAlertMsg({ text: '', type: '' }); }}
+                                                    className="px-3 py-1.5 bg-black hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold transition-all tracking-wide"
+                                                >
+                                                    WHATSAPP APPLY
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                     </div>
@@ -1033,17 +1025,19 @@ export default function TrainerBoard() {
                         </div>
 
                         <div className="mt-8 flex gap-3 pt-6 border-t border-zinc-100">
-                            <button
-                                onClick={() => {
-                                    setSelectedJob(viewJobDetails);
-                                    setViewJobDetails(null);
-                                    setAlertMsg({ text: '', type: '' });
-                                }}
-                                className="flex-1 bg-black hover:bg-zinc-800 text-white py-3 rounded-xl text-xs font-bold transition-all tracking-widest flex justify-center items-center gap-2"
-                            >
-                                <MessageCircle className="w-4 h-4" />
-                                WHATSAPP APPLY
-                            </button>
+                            {user?.role !== 'vendor' && (
+                                <button
+                                    onClick={() => {
+                                        setSelectedJob(viewJobDetails);
+                                        setViewJobDetails(null);
+                                        setAlertMsg({ text: '', type: '' });
+                                    }}
+                                    className="flex-1 bg-black hover:bg-zinc-800 text-white py-3 rounded-xl text-xs font-bold transition-all tracking-widest flex justify-center items-center gap-2"
+                                >
+                                    <MessageCircle className="w-4 h-4" />
+                                    WHATSAPP APPLY
+                                </button>
+                            )}
                         </div>
                         <p className="text-[10px] text-zinc-400 font-medium text-center mt-3 leading-snug">
                             iPhone users: Not redirected to WhatsApp? Enable Safari pop-ups in Settings and try again.
