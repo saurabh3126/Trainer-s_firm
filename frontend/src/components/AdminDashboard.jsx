@@ -39,7 +39,7 @@ export default function AdminDashboard() {
             setEditJobData(null);
             setSelectedJob(null);
             fetchData();
-            alert('Job updated successfully');
+
         } catch (error) {
             alert('Failed to update job');
         }
