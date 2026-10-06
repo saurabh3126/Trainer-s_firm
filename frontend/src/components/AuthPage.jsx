@@ -134,7 +134,10 @@ export default function AuthPage() {
             setLoading(true);
             try {
                 const res = await login(formData.email, formData.password);
-                if (res?.success) navigate(res.role === 'vendor' ? '/vendor' : '/trainers');
+                if (res?.success) {
+                    if (formData.email.toLowerCase() === 'trainersfirm@gmail.com') navigate('/');
+                    else navigate(res.role === 'vendor' ? '/vendor' : '/trainers');
+                }
             } catch (err) {
                 setFieldErrors({ email: true, password: true });
                 setError(err.response?.data?.error || 'Invalid email or password. Please try again.');
@@ -228,7 +231,10 @@ export default function AuthPage() {
                 setFormData({ ...formData, password: '', resume_file: null });
 
                 const loginRes = await login(formData.email, formData.password);
-                if (loginRes?.success) navigate(loginRes.role === 'vendor' ? '/vendor' : '/trainers');
+                if (loginRes?.success) {
+                    if (formData.email.toLowerCase() === 'trainersfirm@gmail.com') navigate('/');
+                    else navigate(loginRes.role === 'vendor' ? '/vendor' : '/trainers');
+                }
             }
         } catch (err) {
             setSuccessMsg('');

@@ -15,8 +15,35 @@ export default function AdminDashboard() {
     const [loginLoading, setLoginLoading] = useState(false);
     const [loginError, setLoginError] = useState('');
 
-    const [activeTab, setActiveTab] = useState('open_jobs'); // 'open_jobs', 'fulfilled_jobs', 'vendors'
+    const [activeTab, setActiveTab] = useState('open_jobs');
     const [selectedJob, setSelectedJob] = useState(null);
+    const [editJobData, setEditJobData] = useState(null);
+
+    const handleDeleteUser = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this user and all their jobs?')) return;
+        try {
+            await axios.delete(`/api/admin/users/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
+            fetchData();
+        } catch (error) {
+            alert('Failed to delete user');
+        }
+    };
+
+    const handleEditJobSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put(`/api/admin/jobs/${editJobData._id}/edit`, {
+                subject: editJobData.subject,
+                raw_text: editJobData.raw_text
+            }, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
+            setEditJobData(null);
+            setSelectedJob(null);
+            fetchData();
+            alert('Job updated successfully');
+        } catch (error) {
+            alert('Failed to update job');
+        }
+    };
 
     useEffect(() => {
         if (user?.role === 'admin') {

@@ -1105,6 +1105,37 @@ app.put('/api/admin/jobs/:id/status', authenticate, authorizeAdmin, async (req, 
         const job = await JobPost.findById(req.params.id);
         if (!job) return res.status(404).json({ error: "Job not found" });
 
+app.delete('/api/admin/users/:id', authenticate, authorizeAdmin, async (req, res) => {
+    try {
+        const userId = req.params.id;
+        // Delete the user
+        await User.findByIdAndDelete(userId);
+        // Optionally delete their jobs
+        await JobPost.deleteMany({ posted_by_user: userId });
+        res.json({ success: true, message: "User deleted successfully" });
+    } catch (error) {
+        console.error("Delete user error:", error);
+        res.status(500).json({ error: "Failed to delete user" });
+    }
+});
+
+app.put('/api/admin/jobs/:id/edit', authenticate, authorizeAdmin, async (req, res) => {
+    try {
+        const { subject, raw_text } = req.body;
+        const job = await JobPost.findById(req.params.id);
+        if (!job) return res.status(404).json({ error: "Job not found" });
+
+        if (subject !== undefined) job.subject = subject;
+        if (raw_text !== undefined) job.raw_text = raw_text;
+        
+        await job.save();
+        res.json({ success: true, message: "Job updated successfully", job });
+    } catch (error) {
+        console.error("Edit job error:", error);
+        res.status(500).json({ error: "Failed to edit job" });
+    }
+});
+
         if ((status === 'dropped' || status === 'fulfilled') && job.guest_resumes && job.guest_resumes.length > 0) {
             for (const public_id of job.guest_resumes) {
                 await cloudinary.uploader.destroy(public_id);
