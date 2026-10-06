@@ -19,6 +19,7 @@ export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('open_jobs');
     const [selectedJob, setSelectedJob] = useState(null);
     const [editJobData, setEditJobData] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleDeleteUser = async (id) => {
         if (!window.confirm('Are you sure you want to delete this user and all their jobs?')) return;
@@ -32,6 +33,7 @@ export default function AdminDashboard() {
 
     const handleEditJobSubmit = async (e) => {
         e.preventDefault();
+        setIsSaving(true);
         try {
             await axios.put(`/api/admin/jobs/${editJobData._id}/edit`, {
                 subject: editJobData.subject,
@@ -44,6 +46,8 @@ export default function AdminDashboard() {
 
         } catch (error) {
             toast.error('Failed to update job');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -313,7 +317,7 @@ export default function AdminDashboard() {
                                         <textarea value={editJobData.cleaned_text || editJobData.raw_text || ''} onChange={e => setEditJobData({...editJobData, cleaned_text: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-medium focus:border-black focus:outline-none focus:ring-1 focus:ring-black h-40 resize-none" required />
                                     </div>
                                     <div className="flex gap-3 pt-2">
-                                        <button type="submit" className="px-6 py-2.5 bg-black text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors">Save Changes</button>
+                                        <button type="submit" disabled={isSaving} className="px-6 py-2.5 bg-black text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center gap-2">{isSaving ? <><Loader2 className="w-3 h-3 animate-spin" /> Saving...</> : "Save Changes"}</button>
                                         <button type="button" onClick={() => setEditJobData(null)} className="px-6 py-2.5 border border-zinc-200 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-50 transition-colors">Cancel</button>
                                     </div>
                                 </form>
