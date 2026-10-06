@@ -62,26 +62,30 @@ export default function LandingPage() {
 
                         <div className="flex flex-wrap items-center gap-3 pt-2">
                             {user?.role === 'vendor' ? (
-                                <Link 
-                                    to="/vendor"
-                                    className="px-6 py-3.5 bg-black hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2"
-                                >
+                                <Link to="/vendor" className="px-6 py-3.5 bg-black hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2">
                                     Open Vendor Dashboard <ArrowRight className="w-4 h-4" />
                                 </Link>
+                            ) : user?.role === 'admin' ? (
+                                <Link to="/admin" className="px-6 py-3.5 bg-black hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                    Open Admin Dashboard <ArrowRight className="w-4 h-4" />
+                                </Link>
                             ) : (
-                                <Link 
-                                    to="/trainers"
-                                    className="px-6 py-3.5 bg-black hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2"
-                                >
+                                <Link to="/trainers" className="px-6 py-3.5 bg-black hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2">
                                     Find Trainer Jobs <ArrowRight className="w-4 h-4" />
                                 </Link>
                             )}
-                            <Link 
-                                to={user?.role === 'vendor' ? "/profile?tab=posted" : "/vendor"}
-                                className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl font-semibold text-sm transition-all shadow-sm hover:border-slate-400"
-                            >
-                                {user?.role === 'vendor' ? 'My Posted Requirements' : 'Post a Requirement'}
-                            </Link>
+                            
+                            {user?.role === 'vendor' && (
+                                <Link to="/profile?tab=posted" className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl font-semibold text-sm transition-all shadow-sm hover:border-slate-400">
+                                    My Posted Requirements
+                                </Link>
+                            )}
+
+                            {(!user || user?.role === 'admin') && (
+                                <Link to="/vendor" className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl font-semibold text-sm transition-all shadow-sm hover:border-slate-400">
+                                    Post a Requirement
+                                </Link>
+                            )}
                         </div>
                     </div>
 
