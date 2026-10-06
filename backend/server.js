@@ -624,8 +624,41 @@ app.post('/api/jobs/parse', async (req, res) => {
         Return ONLY valid JSON.
         `;
 
-        const result = await model.generateContent(prompt);
-        let aiResponseText = result.response.text().trim();
+        let aiResponseText = '';
+        try {
+            const result = await model.generateContent(prompt);
+            aiResponseText = result.response.text().trim();
+        } catch (geminiError) {
+            console.warn("Gemini parsing failed, falling back to ChatGPT:", geminiError.message);
+            if (!process.env.OPENAI_API_KEY) {
+                console.error("OpenAI API key is missing. Cannot fallback.");
+                return res.status(500).json({ error: "Parsing failed and backup AI is not configured." });
+            }
+            
+            try {
+                const openaiResponse = await axios.post(
+                    'https://api.openai.com/v1/chat/completions',
+                    {
+                        model: "gpt-3.5-turbo",
+                        messages: [
+                            { role: "system", content: "You are a highly capable AI assistant that strictly returns valid JSON." },
+                            { role: "user", content: prompt }
+                        ],
+                        temperature: 0.2
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                aiResponseText = openaiResponse.data.choices[0].message.content.trim();
+            } catch (openaiError) {
+                console.error("ChatGPT Fallback Error:", openaiError.response?.data || openaiError.message);
+                return res.status(500).json({ error: "Both primary and backup AI failed to parse requirement." });
+            }
+        }
         
         if (aiResponseText.startsWith('```json')) {
             aiResponseText = aiResponseText.replace(/^```json\n/, '').replace(/\n```$/, '');
