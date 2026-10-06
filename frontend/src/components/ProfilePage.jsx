@@ -266,7 +266,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="flex flex-col items-start gap-1">
                                     <h3 className="text-lg font-bold text-slate-900">{user.name}</h3>
-                                    <p className="text-xs text-slate-500 mb-2">Hover state shown · JPG or PNG up to 3 MB</p>
+                                    <p className="text-xs text-slate-500 mb-2">JPG or PNG up to 3 MB</p>
                                     <label className="px-4 py-2 border border-slate-300 rounded-md text-xs font-bold text-slate-900 cursor-pointer hover:bg-slate-50 transition-colors uppercase">
                                         UPLOAD NEW PHOTO
                                         <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
@@ -286,9 +286,18 @@ export default function ProfilePage() {
                                         <label className="block text-xs font-bold text-slate-700 mb-1.5">Phone</label>
                                         <div className="relative flex items-center">
                                             <span className="absolute left-3 text-sm font-medium text-slate-500">+91</span>
-                                            <input type="text" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value.replace(/\D/g, '')})} className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400" />
+                                            <input type="text" disabled={showPhoneOtp} value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value.replace(/\D/g, '')})} className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 disabled:bg-slate-50 disabled:text-slate-500" />
                                         </div>
                                     </div>
+                                    {showPhoneOtp && (
+                                        <div className="col-span-1 sm:col-span-2 mt-2 p-4 bg-red-50 border border-red-100 rounded-lg animate-in fade-in zoom-in-95 duration-200">
+                                            <label className="block text-xs font-bold text-red-900 mb-2">Enter the 6-digit OTP sent to +91 {profileData.phone}</label>
+                                            <input type="text" value={phoneOtp} onChange={e => setPhoneOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="------" className="w-full px-3.5 py-2.5 bg-white border border-red-200 rounded-md text-lg font-black text-slate-900 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 text-center tracking-[0.5em]" />
+                                            <div className="mt-3 text-right">
+                                                <button type="button" onClick={() => setShowPhoneOtp(false)} className="text-xs text-red-600 hover:text-red-800 font-bold underline">Cancel phone change</button>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div>
                                         <label className="block text-xs font-bold text-slate-700 mb-1.5">Email</label>
                                         <input type="email" value={profileData.email} onChange={e => setProfileData({...profileData, email: e.target.value})} className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400" />
@@ -682,3 +691,4 @@ export default function ProfilePage() {
         </div>
     );
 }
+
