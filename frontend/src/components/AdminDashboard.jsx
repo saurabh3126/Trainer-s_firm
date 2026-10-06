@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -25,7 +26,7 @@ export default function AdminDashboard() {
             await axios.delete(`/api/admin/users/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
             fetchData();
         } catch (error) {
-            alert('Failed to delete user');
+            toast.error('Failed to delete user');
         }
     };
 
@@ -41,7 +42,7 @@ export default function AdminDashboard() {
             fetchData();
 
         } catch (error) {
-            alert('Failed to update job');
+            toast.error('Failed to update job');
         }
     };
 
@@ -89,7 +90,7 @@ export default function AdminDashboard() {
             await axios.put(`/api/admin/jobs/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
             fetchData();
         } catch (e) {
-            alert('Failed to update job status');
+            toast.error('Failed to update job status');
         }
     };
 
@@ -98,7 +99,7 @@ export default function AdminDashboard() {
             await axios.put(`/api/admin/vendors/${id}/verify`, {}, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
             fetchData();
         } catch (e) {
-            alert('Failed to verify vendor');
+            toast.error('Failed to verify vendor');
         }
     };
 

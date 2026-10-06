@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import Preloader from './components/Preloader.jsx';
 import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
@@ -153,7 +154,8 @@ function App() {
   const [ready, setReady] = useState(false);
 
   return (
-    <BrowserRouter>
+            <BrowserRouter>
+            <Toaster position="bottom-center" />
       {/* Always-on background — visible even during preloader */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <MoltenMetal

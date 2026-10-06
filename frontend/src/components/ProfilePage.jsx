@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
@@ -115,7 +116,7 @@ export default function ProfilePage() {
             fetchHistory(); // refresh the list
         } catch (error) {
             console.error('Error fulfilling job:', error);
-            alert('Failed to mark job as fulfilled. Please try again.');
+            toast.error('Failed to mark job as fulfilled. Please try again.');
         }
         setFulfillLoading(false);
     };

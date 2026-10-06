@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -122,13 +123,13 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
             await axios.put(`/api/jobs/${selectedJob._id}/fulfill`, fulfillData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert('Job successfully marked as fulfilled!');
+            toast.success('Job successfully marked as fulfilled!');
             setShowFulfillForm(false);
             setSelectedJob(null);
             fetchVendorHistory();
         } catch (error) {
             console.error('Error fulfilling job:', error);
-            alert('Failed to mark job as fulfilled. Please try again.');
+            toast.error('Failed to mark job as fulfilled. Please try again.');
         }
         setFulfillLoading(false);
     };
@@ -177,7 +178,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
     const submitFulfill = async () => {
         for (const t of fulfillList) {
             if (!t.trainer_name || !t.trainer_phone) {
-                return alert("Please provide both the trainer's name and phone number for all entries.");
+                return toast.error("Please provide both the trainer's name and phone number for all entries.");
             }
         }
         
@@ -195,7 +196,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
             fetchVendorHistory(); 
         } catch (error) {
             console.error("Fulfill error:", error);
-            alert(error.response?.data?.error || "Failed to fulfill job.");
+            toast.error(error.response?.data?.error || "Failed to fulfill job.");
         }
     };
 
@@ -213,12 +214,12 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
     }, [user]);
 
     const saveCurrentDraft = () => {
-        if (!formData.raw_text.trim()) return alert("Nothing to save!");
+        if (!formData.raw_text.trim()) return toast.error("Nothing to save!");
         const newDraft = { id: Date.now(), text: formData.raw_text, date: new Date().toISOString() };
         const updated = [newDraft, ...drafts];
         setDrafts(updated);
         localStorage.setItem(`venty_drafts_${user.id || user._id}`, JSON.stringify(updated));
-        alert("Draft saved successfully!");
+        toast.success("Draft saved successfully!");
     };
 
     const handleSelectDraft = (d) => {
@@ -232,10 +233,10 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
             await axios.delete(`/api/jobs/${jobId}`);
             setJobHistory(jobHistory.filter(j => j._id !== jobId));
             if (selectedJob && selectedJob._id === jobId) setSelectedJob(null);
-            alert("Job deleted successfully");
+            toast.success("Job deleted successfully");
         } catch (error) {
             console.error(error);
-            alert("Failed to delete job");
+            toast.error("Failed to delete job");
         }
     };
 
@@ -309,7 +310,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
             }
         } catch (error) {
             console.error(error);
-            alert("Error parsing data. Ensure your backend server is running.");
+            toast.error("Error parsing data. Ensure your backend server is running.");
         }
         setLoading(false);
     };
@@ -327,7 +328,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
     const handlePublish = async () => {
         const missingKeys = MANDATORY_FIELDS.filter(key => !parsedData[key] || parsedData[key].toString().trim() === '');
         if (missingKeys.length > 0) {
-            return alert(`Cannot publish. Missing: ${missingKeys.map(k => FIELD_LABELS[k] || k).join(', ')}`);
+            return toast.error(`Cannot publish. Missing: ${missingKeys.map(k => FIELD_LABELS[k] || k).join(', ')}`);
         }
         setPublishing(true);
         try {
@@ -353,7 +354,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
             fetchVendorHistory();
         } catch (error) {
             console.error('Publish error:', error.response?.data || error.message);
-            alert(`Error publishing: ${error.response?.data?.error || error.message}`);
+            toast.error(`Error publishing: ${error.response?.data?.error || error.message}`);
         }
         setPublishing(false);
     };
@@ -464,7 +465,7 @@ const [fulfillingJobId, setFulfillingJobId] = useState(null);
         const isMandatory = MANDATORY_FIELDS.includes(currentField);
 
         if (isMandatory && (!currentValue || currentValue.toString().trim() === '')) {
-            return alert(`${FIELD_LABELS[currentField]} is a mandatory field. Please enter a value to continue.`);
+            return toast.error(`${FIELD_LABELS[currentField]} is a mandatory field. Please enter a value to continue.`);
         }
 
         advanceWizard();
