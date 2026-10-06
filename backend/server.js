@@ -1105,6 +1105,21 @@ app.put('/api/admin/jobs/:id/status', authenticate, authorizeAdmin, async (req, 
         const job = await JobPost.findById(req.params.id);
         if (!job) return res.status(404).json({ error: "Job not found" });
 
+        if ((status === 'dropped' || status === 'fulfilled') && job.guest_resumes && job.guest_resumes.length > 0) {
+            for (const public_id of job.guest_resumes) {
+                await cloudinary.uploader.destroy(public_id);
+            }
+            job.guest_resumes = [];
+        }
+
+        job.status = status;
+        await job.save();
+        res.json({ success: true, message: `Job marked as ${status}` });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update job status" });
+    }
+});
+
 app.delete('/api/admin/users/:id', authenticate, authorizeAdmin, async (req, res) => {
     try {
         const userId = req.params.id;
@@ -1133,21 +1148,6 @@ app.put('/api/admin/jobs/:id/edit', authenticate, authorizeAdmin, async (req, re
     } catch (error) {
         console.error("Edit job error:", error);
         res.status(500).json({ error: "Failed to edit job" });
-    }
-});
-
-        if ((status === 'dropped' || status === 'fulfilled') && job.guest_resumes && job.guest_resumes.length > 0) {
-            for (const public_id of job.guest_resumes) {
-                await cloudinary.uploader.destroy(public_id);
-            }
-            job.guest_resumes = [];
-        }
-
-        job.status = status;
-        await job.save();
-        res.json({ success: true, message: `Job marked as ${status}.` });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update job status" });
     }
 });
 
