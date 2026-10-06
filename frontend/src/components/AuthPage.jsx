@@ -14,6 +14,20 @@ export default function AuthPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
+
+    // Evaluates password strength and validity
+    const getPasswordStrength = (pass) => {
+        if (!pass) return { message: '', color: '', valid: false };
+        const hasLetters = /[a-zA-Z]/.test(pass);
+        const hasNumbers = /[0-9]/.test(pass);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+
+        if (pass.length < 8) return { message: 'Weak - must be at least 8 characters', color: 'text-red-500', valid: false };
+        if (hasLetters && hasNumbers && hasSpecial) return { message: 'Strong', color: 'text-emerald-600', valid: true };
+        if (hasLetters && hasNumbers) return { message: 'Good', color: 'text-blue-500', valid: true };
+        return { message: 'Weak - requires letter and number', color: 'text-red-500', valid: false };
+    };
+
     const [forgotStep, setForgotStep] = useState(1);
     const [forgotContact, setForgotContact] = useState('');
     const [forgotOtp, setForgotOtp] = useState('');
@@ -35,7 +49,6 @@ export default function AuthPage() {
         location: ''
     });
 
-    const [passStrength, setPassStrength] = useState({ message: '', color: '', valid: false });
     const [emailValid, setEmailValid] = useState(true);
     const [fieldErrors, setFieldErrors] = useState({});
 
@@ -136,7 +149,7 @@ export default function AuthPage() {
             currentErrors.email = true;
         }
         
-        if (!formData.password || !passStrength.valid) currentErrors.password = true;
+        if (!formData.password || !getPasswordStrength(formData.password).valid) currentErrors.password = true;
         if (!formData.phone || formData.phone.length !== 10) currentErrors.phone = true;
         if (formData.role === 'trainer' && !formData.resume_file) currentErrors.resume_file = true;
 
@@ -319,7 +332,12 @@ export default function AuthPage() {
                                         </div>
                                         <div>
                                             <label className={labelCls}>New Password</label>
-                                            <input type="password" required minLength="6" className={getInputCls('password')} value={forgotNewPassword} onChange={e => setForgotNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
+                                            <input type="password" required className={getInputCls('password')} value={forgotNewPassword} onChange={e => setForgotNewPassword(e.target.value)} placeholder="Minimum 8 characters" />
+                                            {forgotNewPassword && (
+                                                <div className={`text-[10px] font-bold mt-1.5 ${getPasswordStrength(forgotNewPassword).color}`}>
+                                                    {getPasswordStrength(forgotNewPassword).message}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="pt-2">
                                             <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
@@ -558,9 +576,9 @@ export default function AuthPage() {
                                                 </button>
                                             </div>
                                         </div>
-                                            {!isLogin && passStrength.message && (
-                                                <div className={`text-[10px] font-bold mt-1.5 ${passStrength.color}`}>
-                                                    {passStrength.message}
+                                            {!isLogin && formData.password && (
+                                                <div className={`text-[10px] font-bold mt-1.5 ${getPasswordStrength(formData.password).color}`}>
+                                                    {getPasswordStrength(formData.password).message}
                                                 </div>
                                             )}
 
