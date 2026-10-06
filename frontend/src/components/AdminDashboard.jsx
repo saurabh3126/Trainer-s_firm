@@ -191,6 +191,9 @@ export default function AdminDashboard() {
                         </div>
                         <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-none">Admin overview.</h1>
                     </div>
+                    <a href="/vendor" className="px-5 py-2.5 bg-black text-white text-xs font-black rounded-full hover:bg-zinc-800 transition-colors whitespace-nowrap self-end mb-1">
+                        + Add New Post
+                    </a>
                 </div>
 
                 {/* Stats Grid */}
@@ -269,6 +272,12 @@ export default function AdminDashboard() {
                                                     >
                                                         {vendor.isVerified ? 'Revoke Verification' : 'Verify Vendor'}
                                                     </button>
+                                                    <button 
+                                                        onClick={() => handleDeleteUser(vendor._id)}
+                                                        className="text-[10px] font-black flex items-center gap-1 px-3 py-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors"
+                                                    >
+                                                        Delete User
+                                                    </button>
                                                 </div>
                                             </div>
                                         ))}
@@ -291,57 +300,81 @@ export default function AdminDashboard() {
                             </button>
                         </div>
                         <div className="p-6 space-y-6">
-                            <div>
-                                <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Subject / Requirement</h3>
-                                <p className="text-sm font-bold text-zinc-900">{selectedJob.subject || 'Not specified'}</p>
-                            </div>
+                            {editJobData ? (
+                                <form onSubmit={handleEditJobSubmit} className="space-y-4">
+                                    <div>
+                                        <label className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2 block">Subject</label>
+                                        <input type="text" value={editJobData.subject || ''} onChange={e => setEditJobData({...editJobData, subject: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-bold focus:border-black focus:outline-none focus:ring-1 focus:ring-black" required />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2 block">Raw Text / Description</label>
+                                        <textarea value={editJobData.raw_text || ''} onChange={e => setEditJobData({...editJobData, raw_text: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-medium focus:border-black focus:outline-none focus:ring-1 focus:ring-black h-40 resize-none" required />
+                                    </div>
+                                    <div className="flex gap-3 pt-2">
+                                        <button type="submit" className="px-6 py-2.5 bg-black text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors">Save Changes</button>
+                                        <button type="button" onClick={() => setEditJobData(null)} className="px-6 py-2.5 border border-zinc-200 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-50 transition-colors">Cancel</button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Subject / Requirement</h3>
+                                        <p className="text-sm font-bold text-zinc-900">{selectedJob.subject || 'Not specified'}</p>
+                                    </div>
+                                    <button onClick={() => setEditJobData({...selectedJob})} className="px-4 py-1.5 bg-zinc-100 text-zinc-900 text-[10px] font-black rounded-full hover:bg-zinc-200 transition-colors border border-zinc-200">
+                                        Edit Post
+                                    </button>
+                                </div>
                             
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Vendor Name</h3>
-                                    <p className="text-sm font-bold text-zinc-900 flex items-center gap-1">
-                                        {selectedJob.vendor_id?.name || selectedJob.vendor_name || 'N/A'}
-                                        {selectedJob.posted_by_user?.isVerified && <BadgeCheck className="w-4 h-4 text-blue-500" />}
-                                    </p>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Vendor Name</h3>
+                                        <p className="text-sm font-bold text-zinc-900 flex items-center gap-1">
+                                            {selectedJob.vendor_id?.name || selectedJob.vendor_name || 'N/A'}
+                                            {selectedJob.posted_by_user?.isVerified && <BadgeCheck className="w-4 h-4 text-blue-500" />}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Contact Number</h3>
+                                        <p className="text-sm font-bold text-zinc-900">{selectedJob.vendor_id?.phone || selectedJob.contact_number || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Location</h3>
+                                        <p className="text-sm font-bold text-zinc-900">{selectedJob.city || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Mode</h3>
+                                        <p className="text-sm font-bold text-zinc-900">{selectedJob.mode || 'N/A'}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Contact Number</h3>
-                                    <p className="text-sm font-bold text-zinc-900">{selectedJob.vendor_id?.phone || selectedJob.contact_number || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Location</h3>
-                                    <p className="text-sm font-bold text-zinc-900">{selectedJob.city || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Mode</h3>
-                                    <p className="text-sm font-bold text-zinc-900">{selectedJob.mode || 'N/A'}</p>
-                                </div>
-                            </div>
 
-                            <div>
-                                <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Raw Text / Description</h3>
-                                <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
-                                    <p className="text-sm font-medium text-zinc-800 whitespace-pre-wrap">{selectedJob.raw_text}</p>
+                                <div>
+                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Raw Text / Description</h3>
+                                    <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
+                                        <p className="text-sm font-medium text-zinc-800 whitespace-pre-wrap">{selectedJob.raw_text}</p>
+                                    </div>
                                 </div>
-                            </div>
                             
-                            <div className="pt-4 flex justify-end gap-3">
-                                <button 
-                                    onClick={() => setSelectedJob(null)}
-                                    className="px-6 py-2 border border-zinc-200 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-50"
-                                >
-                                    Close
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        handleToggleFulfill(selectedJob._id, selectedJob.status);
-                                        setSelectedJob(null);
-                                    }}
-                                    className={`px-6 py-2 rounded-lg text-xs font-black uppercase tracking-wider text-white transition-colors ${selectedJob.status === 'open' ? 'bg-black hover:bg-zinc-800' : 'bg-emerald-600 hover:bg-emerald-700'}`}
-                                >
-                                    {selectedJob.status === 'open' ? 'Mark as Fulfilled' : 'Reopen Job'}
-                                </button>
-                            </div>
+                                <div className="pt-4 flex justify-end gap-3">
+                                    <button 
+                                        onClick={() => setSelectedJob(null)}
+                                        className="px-6 py-2 border border-zinc-200 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-50"
+                                    >
+                                        Close
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            handleToggleFulfill(selectedJob._id, selectedJob.status);
+                                            setSelectedJob(null);
+                                        }}
+                                        className={`px-6 py-2 rounded-lg text-xs font-black uppercase tracking-wider text-white transition-colors ${selectedJob.status === 'open' ? 'bg-black hover:bg-zinc-800' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                                    >
+                                        {selectedJob.status === 'open' ? 'Mark as Fulfilled' : 'Reopen Job'}
+                                    </button>
+                                </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

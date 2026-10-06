@@ -13,6 +13,7 @@ export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(mode !== 'register' && mode !== 'signup');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
     const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
 
     // Evaluates password strength and validity
@@ -133,7 +134,7 @@ export default function AuthPage() {
 
             setLoading(true);
             try {
-                const res = await login(formData.email, formData.password);
+                const res = await login(formData.email, formData.password, rememberMe);
                 if (res?.success) {
                     if (formData.email.toLowerCase() === 'trainersfirm@gmail.com') navigate('/');
                     else navigate(res.role === 'vendor' ? '/vendor' : '/trainers');
@@ -653,7 +654,7 @@ export default function AuthPage() {
                                         
                                         <div className="flex items-center justify-between pt-1">
                                             <label className="flex items-center gap-1.5 cursor-pointer">
-                                                <input type="checkbox" className="w-3 h-3 rounded border-zinc-300 text-black focus:ring-black" />
+                                                <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-3 h-3 rounded border-zinc-300 text-black focus:ring-black" />
                                                 <span className="text-[10px] font-medium text-zinc-600">Remember me</span>
                                             </label>
                                             <button type="button" onClick={() => setForgotPasswordMode(true)} className="text-[10px] font-semibold text-black hover:underline">Forgot password?</button>

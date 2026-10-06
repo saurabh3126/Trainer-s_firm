@@ -8,23 +8,23 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check local storage for an existing session on page load
-        const storedUser = localStorage.getItem('venty_user');
-        const token = localStorage.getItem('venty_token');
+        // Check both storages for an existing session on page load
+        const storedUser = localStorage.getItem('venty_user') || sessionStorage.getItem('venty_user');
+        const token = localStorage.getItem('venty_token') || sessionStorage.getItem('venty_token');
         
         if (storedUser && token) {
             setUser(JSON.parse(storedUser));
-            // Automatically attach the token to all future Axios requests
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
         setLoading(false);
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (email, password, rememberMe = true) => {
         const res = await axios.post('/api/auth/login', { email, password });
         if (res.data.success) {
-            localStorage.setItem('venty_token', res.data.token);
-            localStorage.setItem('venty_user', JSON.stringify(res.data.user));
+            const storage = rememberMe ? localStorage : sessionStorage;
+            storage.setItem('venty_token', res.data.token);
+            storage.setItem('venty_user', JSON.stringify(res.data.user));
             setUser(res.data.user);
             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
             return { success: true, role: res.data.user.role };
@@ -39,6 +39,8 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('venty_token');
         localStorage.removeItem('venty_user');
+        sessionStorage.removeItem('venty_token');
+        sessionStorage.removeItem('venty_user');
         setUser(null);
         delete axios.defaults.headers.common['Authorization'];
     };
