@@ -20,6 +20,15 @@ export default function AdminDashboard() {
     const [selectedJob, setSelectedJob] = useState(null);
     const [editJobData, setEditJobData] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
+    
+    // Sort and Filter States
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [sortBy, setSortBy] = useState('date_desc');
+    
+    // Fulfill States
+    const [fulfillingJobId, setFulfillingJobId] = useState(null);
+    const [fulfillData, setFulfillData] = useState({ trainer_name: '', trainer_phone: '' });
+    const [isFulfilling, setIsFulfilling] = useState(false);
 
     const handleDeleteUser = async (id) => {
         if (!window.confirm('Are you sure you want to delete this user and all their jobs?')) return;
@@ -90,13 +99,39 @@ export default function AdminDashboard() {
     };
 
     const handleToggleFulfill = async (id, currentStatus) => {
-        try {
-            const newStatus = currentStatus === 'open' ? 'fulfilled' : 'open';
-            await axios.put(`/api/admin/jobs/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
-            fetchData();
-        } catch (e) {
-            toast.error('Failed to update job status');
+        if (currentStatus === 'open') {
+            // Open fulfill modal instead of instantly fulfilling
+            setFulfillingJobId(id);
+            setFulfillData({ trainer_name: '', trainer_phone: '' });
+            return;
         }
+        
+        // Reopen immediately
+        try {
+            await axios.put(`/api/admin/jobs/${id}/status`, { status: 'open' }, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
+            fetchData();
+            toast.success('Job reopened successfully');
+        } catch (e) {
+            toast.error('Failed to reopen job');
+        }
+    };
+
+    const submitFulfill = async (e) => {
+        e.preventDefault();
+        if (!fulfillData.trainer_name || !fulfillData.trainer_phone) {
+            return toast.error("Trainer name and phone are required");
+        }
+        setIsFulfilling(true);
+        try {
+            await axios.put(`/api/jobs/${fulfillingJobId}/fulfill`, fulfillData, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
+            toast.success('Job marked as fulfilled!');
+            setFulfillingJobId(null);
+            if (selectedJob && selectedJob._id === fulfillingJobId) setSelectedJob(null);
+            fetchData();
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to fulfill job');
+        }
+        setIsFulfilling(false);
     };
 
     const handleToggleVerify = async (id) => {
@@ -153,6 +188,22 @@ export default function AdminDashboard() {
         );
     }
 
+    const getProcessedJobs = () => {
+        let result = [...jobs];
+        if (filterStatus !== 'all') {
+            result = result.filter(j => j.status === filterStatus);
+        }
+        
+        result.sort((a, b) => {
+            if (sortBy === 'date_desc') return new Date(b.createdAt) - new Date(a.createdAt);
+            if (sortBy === 'date_asc') return new Date(a.createdAt) - new Date(b.createdAt);
+            if (sortBy === 'updated_desc') return new Date(b.updatedAt) - new Date(a.updatedAt);
+            return 0;
+        });
+        return result;
+    };
+    
+    const processedJobs = getProcessedJobs();
     const openJobs = jobs.filter(j => j.status === 'open');
     const fulfilledJobs = jobs.filter(j => j.status === 'fulfilled');
     const verifiedVendors = vendors.filter(v => v.isVerified).length;
@@ -361,6 +412,22 @@ export default function AdminDashboard() {
                                         <p className="text-sm font-medium text-zinc-800 whitespace-pre-wrap">{selectedJob.cleaned_text || selectedJob.raw_text}</p>
                                     </div>
                                 </div>
+                                
+                                {selectedJob.status === 'fulfilled' && selectedJob.trainer_name && (
+                                    <div>
+                                        <h3 className="text-[10px] font-black tracking-widest text-emerald-600 uppercase mb-2">Fulfillment Record</h3>
+                                        <div className="grid grid-cols-2 gap-4 bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                                            <div>
+                                                <h3 className="text-[10px] font-black text-emerald-800 uppercase mb-1">Trainer Name</h3>
+                                                <p className="text-sm font-bold text-emerald-950">{selectedJob.trainer_name}</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[10px] font-black text-emerald-800 uppercase mb-1">Trainer Phone</h3>
+                                                <p className="text-sm font-bold text-emerald-950">{selectedJob.trainer_phone}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             
                                 <div className="pt-4 flex justify-end gap-3">
                                     <button 
@@ -382,6 +449,30 @@ export default function AdminDashboard() {
                                 </>
                             )}
                         </div>
+                    </div>
+                </div>
+            )}
+            {/* Fulfill Modal */}
+            {fulfillingJobId && (
+                <div className="fixed inset-0 bg-black/60 z-[300] flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6">
+                        <h2 className="text-lg font-black tracking-tight mb-4">Fulfill Requirement</h2>
+                        <form onSubmit={submitFulfill} className="space-y-4">
+                            <div>
+                                <label className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2 block">Trainer Name</label>
+                                <input type="text" value={fulfillData.trainer_name} onChange={e => setFulfillData({...fulfillData, trainer_name: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-bold focus:border-black focus:outline-none focus:ring-1 focus:ring-black" placeholder="E.g. Rahul Kumar" required />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2 block">Trainer Phone</label>
+                                <input type="text" value={fulfillData.trainer_phone} onChange={e => setFulfillData({...fulfillData, trainer_phone: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-bold focus:border-black focus:outline-none focus:ring-1 focus:ring-black" placeholder="10-digit number" required pattern="\d{10}" />
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button type="submit" disabled={isFulfilling} className="flex-1 py-2.5 bg-emerald-600 text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-emerald-700 transition-colors flex justify-center items-center gap-2 disabled:opacity-50">
+                                    {isFulfilling ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />} Mark Fulfilled
+                                </button>
+                                <button type="button" onClick={() => setFulfillingJobId(null)} className="px-6 py-2.5 border border-zinc-200 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-50 transition-colors">Cancel</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
