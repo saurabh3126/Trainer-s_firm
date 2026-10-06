@@ -618,9 +618,7 @@ export default function AuthPage() {
                                                 <input type="checkbox" className="w-3 h-3 rounded border-zinc-300 text-black focus:ring-black" />
                                                 <span className="text-[10px] font-medium text-zinc-600">Remember me</span>
                                             </label>
-                                            <Link to="#" className="text-[10px] font-semibold text-black hover:underline">
-                                                Forgot password?
-                                            </Link>
+                                            <button type="button" onClick={() => setForgotPasswordMode(true)} className="text-[10px] font-semibold text-black hover:underline">Forgot password?</button>
                                         </div>
                                     </>
                                 )}
