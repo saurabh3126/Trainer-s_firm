@@ -52,6 +52,7 @@ export default function AuthPage() {
 
     const [emailValid, setEmailValid] = useState(true);
     const [fieldErrors, setFieldErrors] = useState({});
+    const [passStrength, setPassStrength] = useState({ message: '', color: '', valid: false });
 
     useEffect(() => {
         const currentMode = searchParams.get('mode');
