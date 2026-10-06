@@ -35,7 +35,8 @@ export default function AdminDashboard() {
         try {
             await axios.put(`/api/admin/jobs/${editJobData._id}/edit`, {
                 subject: editJobData.subject,
-                raw_text: editJobData.raw_text
+                raw_text: editJobData.raw_text,
+                cleaned_text: editJobData.cleaned_text
             }, { headers: { Authorization: `Bearer ${localStorage.getItem('venty_token')}` } });
             setEditJobData(null);
             setSelectedJob(null);
@@ -308,8 +309,8 @@ export default function AdminDashboard() {
                                         <input type="text" value={editJobData.subject || ''} onChange={e => setEditJobData({...editJobData, subject: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-bold focus:border-black focus:outline-none focus:ring-1 focus:ring-black" required />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2 block">Raw Text / Description</label>
-                                        <textarea value={editJobData.raw_text || ''} onChange={e => setEditJobData({...editJobData, raw_text: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-medium focus:border-black focus:outline-none focus:ring-1 focus:ring-black h-40 resize-none" required />
+                                        <label className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2 block">Parsed Message (Description)</label>
+                                        <textarea value={editJobData.cleaned_text || editJobData.raw_text || ''} onChange={e => setEditJobData({...editJobData, cleaned_text: e.target.value})} className="w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm font-medium focus:border-black focus:outline-none focus:ring-1 focus:ring-black h-40 resize-none" required />
                                     </div>
                                     <div className="flex gap-3 pt-2">
                                         <button type="submit" className="px-6 py-2.5 bg-black text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors">Save Changes</button>
@@ -351,9 +352,9 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div>
-                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Raw Text / Description</h3>
+                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-2">Parsed Message (Description)</h3>
                                     <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
-                                        <p className="text-sm font-medium text-zinc-800 whitespace-pre-wrap">{selectedJob.raw_text}</p>
+                                        <p className="text-sm font-medium text-zinc-800 whitespace-pre-wrap">{selectedJob.cleaned_text || selectedJob.raw_text}</p>
                                     </div>
                                 </div>
                             

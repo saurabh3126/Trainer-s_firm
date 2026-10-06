@@ -1136,12 +1136,13 @@ app.delete('/api/admin/users/:id', authenticate, authorizeAdmin, async (req, res
 
 app.put('/api/admin/jobs/:id/edit', authenticate, authorizeAdmin, async (req, res) => {
     try {
-        const { subject, raw_text } = req.body;
+        const { subject, raw_text, cleaned_text } = req.body;
         const job = await JobPost.findById(req.params.id);
         if (!job) return res.status(404).json({ error: "Job not found" });
 
         if (subject !== undefined) job.subject = subject;
         if (raw_text !== undefined) job.raw_text = raw_text;
+        if (cleaned_text !== undefined) job.cleaned_text = cleaned_text;
         
         await job.save();
         res.json({ success: true, message: "Job updated successfully", job });
