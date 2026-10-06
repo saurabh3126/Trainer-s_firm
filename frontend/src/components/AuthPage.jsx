@@ -229,9 +229,10 @@ export default function AuthPage() {
                 setShowOtpInput(false);
                 setOtp('');
                 setSuccessMsg('');
+                const savedPassword = formData.password;
                 setFormData({ ...formData, password: '', resume_file: null });
 
-                const loginRes = await login(formData.email, formData.password);
+                const loginRes = await login(formData.email || formData.phone, savedPassword);
                 if (loginRes?.success) {
                     if (formData.email.toLowerCase() === 'trainersfirm@gmail.com') navigate('/');
                     else navigate(loginRes.role === 'vendor' ? '/vendor' : '/trainers');
