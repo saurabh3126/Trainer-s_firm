@@ -7,7 +7,7 @@ import { User, Phone, Briefcase, Link as LinkIcon, Loader2, Save, CheckCircle2, 
 import Loader from './Loader.jsx';
 
 export default function ProfilePage() {
-    const { user } = useContext(AuthContext);
+    const { user, setUser } = useContext(AuthContext);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -33,6 +33,8 @@ export default function ProfilePage() {
     const [skillInput, setSkillInput] = useState('');
     const [updateLoading, setUpdateLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [showPhoneOtp, setShowPhoneOtp] = useState(false);
+    const [phoneOtp, setPhoneOtp] = useState('');
 
     // Photo State
     const [photoFile, setPhotoFile] = useState(null);
@@ -148,6 +150,19 @@ export default function ProfilePage() {
         setUpdateLoading(true);
         setMessage('');
 
+        // Phone changed? Require OTP
+        if (profileData.phone !== user.phone && !showPhoneOtp) {
+            try {
+                await axios.post('/api/auth/send-otp', { phone: profileData.phone.replace(/\D/g, '') });
+                setShowPhoneOtp(true);
+                setMessage('OTP sent to new phone number. Please enter it to confirm.');
+            } catch (error) {
+                setMessage(error.response?.data?.error || 'Failed to send OTP to new number.');
+            }
+            setUpdateLoading(false);
+            return;
+        }
+
         try {
             const token = localStorage.getItem('venty_token');
             let final_resume_url = user.resume_link;
@@ -181,6 +196,7 @@ export default function ProfilePage() {
                 name: profileData.name,
                 email: profileData.email,
                 phone: profileData.phone,
+                otp: phoneOtp,
                 location: profileData.location,
                 skills: profileData.skills,
                 experience_years: profileData.experience_years,
@@ -195,9 +211,13 @@ export default function ProfilePage() {
             });
             
             if (res.data.success) {
-                localStorage.setItem('venty_user', JSON.stringify(res.data.user));
-                setMessage('Profile updated successfully! Refreshing...');
-                setTimeout(() => window.location.reload(), 1000); 
+                const storageUser = sessionStorage.getItem('venty_user') ? sessionStorage : localStorage;
+                storageUser.setItem('venty_user', JSON.stringify(res.data.user));
+                setUser(res.data.user);
+                setShowPhoneOtp(false);
+                setPhoneOtp('');
+                setMessage('Profile updated successfully!');
+                setTimeout(() => setMessage(''), 3000);
             }
         } catch (error) {
             setMessage('Failed to update profile.');

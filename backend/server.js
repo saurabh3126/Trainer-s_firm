@@ -1032,6 +1032,29 @@ app.put('/api/users/profile', authenticate, async (req, res) => {
         }
 
         if (phone && phone !== user.phone) {
+            const { otp } = req.body;
+            if (!otp) return res.status(400).json({ error: "OTP is required to change phone number." });
+            
+            const otpRecord = await OTP.findOne({ email: phone });
+            if (!otpRecord) return res.status(400).json({ error: "OTP session expired or not found." });
+
+            const verificationId = otpRecord.otp;
+            const isMcFlow = verificationId && verificationId.length !== 6;
+            if (isMcFlow) {
+                try {
+                    const mcToken = await getMCToken();
+                    await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
+                        params: { verificationId, code: otp, customerId: process.env.MC_CUSTOMER_ID },
+                        headers: { authToken: mcToken },
+                        timeout: 8000
+                    });
+                } catch (mcErr) {
+                    return res.status(400).json({ error: 'Invalid OTP for new phone number.' });
+                }
+            } else {
+                if (otpRecord.otp !== otp) return res.status(400).json({ error: "Invalid OTP for new phone number." });
+            }
+
             const existingPhone = await User.findOne({ phone });
             if (existingPhone) return res.status(400).json({ error: "Phone number is already in use by another account." });
             user.phone = phone;
