@@ -179,6 +179,7 @@ export default function ProfilePage() {
 
             const payload = {
                 name: profileData.name,
+                email: profileData.email,
                 phone: profileData.phone,
                 location: profileData.location,
                 skills: profileData.skills,
