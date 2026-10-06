@@ -435,12 +435,19 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         if (isPhone) {
             try {
                 const mcToken = await getMCToken();
-                const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', {
-                    countryCode: '91',
-                    customerId: process.env.MC_CUSTOMER_ID,
-                    flowType: 'SMS',
-                    mobileNumber: contact
-                }, { headers: { authToken: mcToken }, timeout: 8000 });
+                const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', null, {
+                    params: {
+                        countryCode: '91',
+                        customerId: process.env.MC_CUSTOMER_ID,
+                        flowType: 'SMS',
+                        mobileNumber: contact,
+                        type: 'OTP',
+                        senderId: process.env.MC_SENDER_ID || 'VENTYS',
+                        otpLength: 6
+                    },
+                    headers: { authToken: mcToken },
+                    timeout: 10000
+                });
                 
                 const vId = otpRes.data?.data?.verificationId;
                 if (!vId) throw new Error("Failed to get verification ID from SMS provider.");
