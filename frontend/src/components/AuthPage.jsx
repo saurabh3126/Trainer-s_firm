@@ -271,10 +271,67 @@ export default function AuthPage() {
                 </div>
 
                 <div className="w-full max-w-[400px]">
+                    
                     <div 
-                        key={isLogin ? 'login' : 'signup'} 
+                        key={forgotPasswordMode ? 'forgot' : (isLogin ? 'login' : 'signup')} 
                         className="bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-8 border border-zinc-100 animate-fade-slide"
                     >
+                        {forgotPasswordMode ? (
+                            <>
+                                <button type="button" onClick={() => setForgotPasswordMode(false)} className="flex items-center text-[11px] font-bold text-zinc-500 mb-6 hover:text-black transition-colors">
+                                    <ArrowLeft className="w-3.5 h-3.5 mr-1" /> BACK TO LOGIN
+                                </button>
+                                <div className="mb-6 text-center">
+                                    <h2 className="text-2xl font-black text-black tracking-tight mb-1">Reset Password.</h2>
+                                    <p className="text-[11px] text-zinc-500 font-medium">Enter email to receive code.</p>
+                                </div>
+                                
+                                {error && (
+                                    <div className="flex items-center gap-2 p-2 mb-4 bg-red-50 border border-red-100 rounded-lg text-[11px] text-red-700 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-500" />
+                                        <span>{error}</span>
+                                    </div>
+                                )}
+                                {successMsg && (
+                                    <div className="flex items-center gap-2 p-2 mb-4 bg-emerald-50 border border-emerald-100 rounded-lg text-[11px] text-emerald-800 font-medium">
+                                        <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0 text-emerald-600" />
+                                        <span>{successMsg}</span>
+                                    </div>
+                                )}
+
+                                {forgotStep === 1 ? (
+                                    <form onSubmit={handleForgotSendOtp} className="space-y-4">
+                                        <div>
+                                            <label className={labelCls}>Email Address</label>
+                                            <input type="email" required className={getInputCls('email')} value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} placeholder="name@example.com" />
+                                        </div>
+                                        <div className="pt-2">
+                                            <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
+                                                {loading ? 'SENDING...' : 'SEND OTP'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <form onSubmit={handleForgotReset} className="space-y-4">
+                                        <div>
+                                            <label className={labelCls}>Reset Code (OTP)</label>
+                                            <input type="text" required className={`${getInputCls('otp')} text-center tracking-[0.5em] font-black text-lg`} value={forgotOtp} onChange={e => setForgotOtp(e.target.value)} placeholder="000000" maxLength="6" />
+                                        </div>
+                                        <div>
+                                            <label className={labelCls}>New Password</label>
+                                            <input type="password" required minLength="6" className={getInputCls('password')} value={forgotNewPassword} onChange={e => setForgotNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
+                                        </div>
+                                        <div className="pt-2">
+                                            <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
+                                                {loading ? 'RESETTING...' : 'RESET PASSWORD'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+                            </>
+                        ) : (
+                            <>
+
                         
                         {/* Headers */}
                         <div className="mb-5 text-center">
@@ -591,7 +648,8 @@ export default function AuthPage() {
                                 </div>
                             </form>
                         )}
-                        
+                            </>
+                        )}
                     </div>
                     
                     {/* Bottom Disclaimer */}
