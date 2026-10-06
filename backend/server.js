@@ -349,6 +349,10 @@ app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, password, phone, whatsapp_number, personal_email, role, experience_years, resume_link, resume_public_id, otp } = req.body;
 
+        if (name && name.trim().toLowerCase() === 'admin (priority job)') {
+            return res.status(400).json({ error: "The name 'Admin (Priority Job)' is reserved and cannot be used." });
+        }
+
         // OTP validation: if MC verificationId stored, validate against MC API; else check our DB
         const otpRecord = await OTP.findOne({ email: phone });
         if (!otpRecord) return res.status(400).json({ error: "OTP session expired. Please restart registration." });
@@ -1021,6 +1025,10 @@ app.post('/api/jobs/contact', async (req, res) => {
 app.put('/api/users/profile', authenticate, async (req, res) => {
     try {
         const { name, email, phone, experience_years, resume_link, resume_public_id, profile_photo, profile_photo_public_id, location, skills } = req.body;
+
+        if (name && name.trim().toLowerCase() === 'admin (priority job)') {
+            return res.status(400).json({ error: "The name 'Admin (Priority Job)' is reserved and cannot be used." });
+        }
         
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ error: "User not found" });
