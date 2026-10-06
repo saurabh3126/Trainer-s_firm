@@ -148,41 +148,15 @@ export default function AdminDashboard() {
 
     if (user?.role !== 'admin') {
         return (
-            <div className="min-h-screen bg-[#f8f8f6] flex items-center justify-center p-4">
-                <div className="max-w-md w-full bg-white p-8 rounded-2xl border border-zinc-200 shadow-xl">
-                    <div className="flex items-center justify-between mb-6">
-                        <img src="/logo.png" alt="Trainer Firm" className="h-10 w-auto object-contain max-w-[200px]" />
-                        <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-md">
-                            <Lock className="w-5 h-5 text-white" />
-                        </div>
-                    </div>
-                    <h2 className="text-2xl font-black text-black tracking-tight mb-2">Platform Access</h2>
-                    <p className="text-sm text-zinc-500 mb-8 font-medium">Enter the master administrative password to securely access platform operations.</p>
-                    
-                    <form onSubmit={handleAdminLogin} className="space-y-4">
-                        <div>
-                            <div className="relative">
-                                <KeyRound className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                <input 
-                                    type="password" 
-                                    placeholder="Enter Admin Password"
-                                    value={adminPass}
-                                    onChange={(e) => setAdminPass(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all"
-                                    autoFocus
-                                />
-                            </div>
-                            {loginError && <p className="text-red-500 text-xs font-bold mt-2 ml-1">{loginError}</p>}
-                        </div>
-                        <button 
-                            type="submit" 
-                            disabled={loginLoading || !adminPass}
-                            className="w-full py-3 bg-black text-white rounded-xl text-sm font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors flex justify-center items-center gap-2 disabled:opacity-50"
-                        >
-                            {loginLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Authenticate'}
-                        </button>
-                    </form>
+            <div className="min-h-screen bg-[#F6F5F3] flex flex-col items-center justify-center p-4 text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-sm">
+                    <Lock className="w-8 h-8 text-red-600" />
                 </div>
+                <h1 className="text-3xl font-black text-zinc-900 tracking-tight mb-2">Unauthorized Access</h1>
+                <p className="text-zinc-500 font-medium max-w-md">You do not have administrative privileges to view this page. If you are an administrator, please log in through the main authentication portal.</p>
+                <Link to="/auth" className="mt-8 px-6 py-2.5 bg-black text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors shadow-md">
+                    Return to Login
+                </Link>
             </div>
         );
     }
