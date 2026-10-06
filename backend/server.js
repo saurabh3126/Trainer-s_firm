@@ -96,7 +96,7 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    phone: { type: String, required: true }, 
+    phone: { type: String, required: true, unique: true }, 
     whatsapp_number: { type: String, default: '' },
     personal_email: { type: String, default: '' },
     profile_photo: { type: String, default: '' },
@@ -113,7 +113,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 const otpSchema = new mongoose.Schema({
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     otp: { type: String, required: true },
     createdAt: { type: Date, default: Date.now, expires: 300 } 
 });
@@ -371,6 +371,21 @@ app.post('/api/auth/register', async (req, res) => {
         } else {
             // Email fallback OTP — check our DB
             if (otpRecord.otp !== otp) return res.status(400).json({ error: "Invalid or expired OTP." });
+        }
+
+        
+        // Final duplicate check before creation
+        if (email) {
+            const existingEmail = await User.findOne({ email });
+            if (existingEmail && !email.endsWith("@no-email.trainerfirm.com")) {
+                return res.status(400).json({ error: "Email is already registered. Please log in." });
+            }
+        }
+        if (phone) {
+            const existingPhone = await User.findOne({ phone });
+            if (existingPhone) {
+                return res.status(400).json({ error: "Phone number is already registered. Please log in." });
+            }
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -1215,6 +1230,9 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
+
+
 
 
 
