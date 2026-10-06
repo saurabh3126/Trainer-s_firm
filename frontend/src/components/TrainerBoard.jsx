@@ -912,6 +912,9 @@ export default function TrainerBoard() {
                                 {contactLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />}
                                 CONTINUE TO WHATSAPP
                             </button>
+                            <p className="text-[10px] text-zinc-400 font-medium text-center mt-3 leading-snug px-2">
+                                iPhone users: Not redirected to WhatsApp? Enable Safari pop-ups in Settings and try again.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1042,6 +1045,9 @@ export default function TrainerBoard() {
                                 WHATSAPP APPLY
                             </button>
                         </div>
+                        <p className="text-[10px] text-zinc-400 font-medium text-center mt-3 leading-snug">
+                            iPhone users: Not redirected to WhatsApp? Enable Safari pop-ups in Settings and try again.
+                        </p>
                     </div>
                 </div>
             )}
