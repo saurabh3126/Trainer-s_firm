@@ -313,9 +313,15 @@ app.post('/api/auth/resend-otp-email', async (req, res) => {
         if (!email) return res.status(400).json({ error: 'Email is required to send the code.' });
         if (!phone) return res.status(400).json({ error: 'Phone is required to look up your OTP session.' });
 
-        // OTP is stored keyed by phone
-        const otpRecord = await OTP.findOne({ email: phone });
-        if (!otpRecord) return res.status(400).json({ error: 'No active OTP found. Please restart registration.' });
+        // Generate a fresh 6-digit OTP
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Overwrite the SMS verification ID with our new email OTP code
+        const otpRecord = await OTP.findOneAndUpdate(
+            { email: phone },
+            { otp: otpCode, mc_verification_id: null },
+            { upsert: true, new: true }
+        );
 
         const mailOptions = {
             from: `"Trainer Firm Support" <${process.env.EMAIL_USER}>`,
@@ -325,7 +331,7 @@ app.post('/api/auth/resend-otp-email', async (req, res) => {
                 <div style="font-family: Arial, sans-serif; padding: 20px; text-align: center;">
                     <h2>Welcome to Trainer Firm!</h2>
                     <p>Your verification code is:</p>
-                    <h1 style="color: #111; letter-spacing: 6px; font-size: 36px;">${otpRecord.otp}</h1>
+                    <h1 style="color: #111; letter-spacing: 6px; font-size: 36px;">${otpCode}</h1>
                     <p>This code will expire in 5 minutes.</p>
                     <p style="font-size:12px;color:#999;">Do not share this code with anyone.</p>
                 </div>
