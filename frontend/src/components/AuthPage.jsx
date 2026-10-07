@@ -2,8 +2,6 @@ import { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { auth } from "../firebase";
 
 import { Loader2, CheckCircle2, AlertCircle, ArrowLeft, Eye, EyeOff, X } from 'lucide-react';
 
@@ -162,7 +160,6 @@ export default function AuthPage() {
                 window.dispatchEvent(new Event('authChange'));
                 navigate(data.user.role === 'vendor' ? '/trainers' : '/jobs');
             } else {
-                setServerVerificationId(data.verificationId || '');
                 setShowOtpInput(true);
             }
         } catch (err) {
