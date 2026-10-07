@@ -363,7 +363,7 @@ app.post('/api/auth/register', async (req, res) => {
             const otpRecord = await OTP.findOne({ email: phone });
             if (!otpRecord) return res.status(400).json({ error: "OTP session expired. Please restart registration." });
             
-            if (otpRecord.otp !== otp) {
+            if (String(otpRecord.otp) !== String(otp)) {
                 return res.status(400).json({ error: "Invalid or expired OTP." });
             }
         }
@@ -493,7 +493,7 @@ app.post('/api/auth/reset-password', async (req, res) => {
         const otpRecord = await OTP.findOne({ email: contact });
         if (!otpRecord) return res.status(400).json({ error: 'No active OTP session found.' });
 
-        if (otpRecord.otp !== otp) {
+        if (String(otpRecord.otp) !== String(otp)) {
             return res.status(400).json({ error: 'Invalid or expired OTP.' });
         }
 
@@ -1007,7 +1007,7 @@ app.put('/api/users/profile', authenticate, async (req, res) => {
             const otpRecord = await OTP.findOne({ email: phone });
             if (!otpRecord) return res.status(400).json({ error: "OTP session expired or not found." });
 
-            if (otpRecord.otp !== otp) {
+            if (String(otpRecord.otp) !== String(otp)) {
                 return res.status(400).json({ error: "Invalid OTP for new phone number." });
             }
 
