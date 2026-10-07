@@ -263,11 +263,8 @@ app.post('/api/auth/send-otp', async (req, res) => {
                 console.error('[MC SMS Error]', smsErr?.response?.data || smsErr.message);
                 if (!email) return res.json({ success: false, smsSent: false, smsFailed: true, error: 'SMS delivery failed. No email fallback available.' });
             }
-        });
-                }
-                // SMS failed but email provided — fall through to email OTP below
-            }
         }
+                // SMS failed but email provided
 
         // ----- FALLBACK: Generate our own OTP for email delivery -----
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
