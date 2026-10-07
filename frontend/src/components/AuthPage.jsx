@@ -11,6 +11,7 @@ export default function AuthPage() {
 
     const mode = searchParams.get('mode');
     const [isLogin, setIsLogin] = useState(mode !== 'register' && mode !== 'signup');
+    const [useFirebase, setUseFirebase] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [rememberMe, setRememberMe] = useState(true);
