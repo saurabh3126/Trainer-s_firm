@@ -14,8 +14,7 @@ export default function AuthPage() {
 
     const mode = searchParams.get('mode');
     const [isLogin, setIsLogin] = useState(mode !== 'register' && mode !== 'signup');
-    const [useFirebase, setUseFirebase] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+        const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [rememberMe, setRememberMe] = useState(true);
     const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
@@ -121,120 +120,56 @@ export default function AuthPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const setupRecaptcha = () => {
-        if (!window.recaptchaVerifier && auth) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                size: 'invisible',
-                callback: () => {
-                    console.log("recaptcha resolved");
-                }
-            });
-        }
-    };
-
-    const handleSendOtp = async (e) => {
+        const handleSendOtp = async (e) => {
         e.preventDefault();
+        setLoading(true);
         setError('');
-        setSuccessMsg('');
-        setFieldErrors({});
-        let currentErrors = {};
 
-        if (isLogin) {
-            if (!formData.email) currentErrors.email = true;
-            if (!formData.password) currentErrors.password = true;
-            
-            if (Object.keys(currentErrors).length > 0) {
-                setFieldErrors(currentErrors);
-                return setError('Please fill out the highlighted fields correctly.');
-            }
-
-            setLoading(true);
-            try {
-                const res = await login(formData.email, formData.password, rememberMe);
-                if (res?.success) {
-                    if (formData.email.toLowerCase() === 'trainersfirm@gmail.com') navigate('/');
-                    else navigate(res.role === 'vendor' ? '/vendor' : '/trainers');
-                }
-            } catch (err) {
-                setFieldErrors({ email: true, password: true });
-                setError(err.response?.data?.error || 'Invalid email or password. Please try again.');
-            }
+        if (formData.role === 'trainer' && !formData.resume_file) {
+            setFieldErrors({ resume_file: true });
+            setError('Please upload your resume to continue.');
             setLoading(false);
             return;
         }
 
-        if (!formData.name || !formData.name.trim()) currentErrors.name = true;
-        
-        if (formData.email && !emailValid) {
-            currentErrors.email = true;
-        }
-        
-        if (!formData.password || !getPasswordStrength(formData.password).valid) currentErrors.password = true;
-        if (!formData.phone || formData.phone.length !== 10) currentErrors.phone = true;
-        if (formData.role === 'trainer' && !formData.resume_file) currentErrors.resume_file = true;
-
-        if (Object.keys(currentErrors).length > 0) {
-            setFieldErrors(currentErrors);
-            let errMsg = 'Please fill out all highlighted fields correctly.';
-            if (currentErrors.email && formData.email) errMsg = 'Please enter a valid email address (e.g., name@example.com).';
-            else if (currentErrors.password) errMsg = 'Password must be at least 8 characters and include a letter and number.';
-            else if (currentErrors.phone) errMsg = 'Please enter a valid 10-digit phone number.';
-            else if (currentErrors.resume_file) errMsg = 'Please upload your resume to continue.';
-            return setError(errMsg);
-        }
-
-        setLoading(true);
         try {
-            console.log('useFirebase:', useFirebase, 'auth:', auth);
-            if (useFirebase && auth) {
-                setupRecaptcha();
-                const appVerifier = window.recaptchaVerifier;
-                const formattedPhone = `+91${formData.phone.replace(/\D/g, '')}`;
-                const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-                window.confirmationResult = confirmationResult;
-                setSuccessMsg('');
-                setOtpChannel('sms');
-                setShowOtpInput(true);
-            } else {
-                const res = await axios.post('/api/auth/send-otp', { email: formData.email, phone: formData.phone.replace(/\D/g, '') });
-                if (res.data.success) {
-                    if (res.data.smsFailed) {
-                        setError('SMS failed to send. Please click "Send to email instead" below.');
-                        setOtpChannel('sms');
-                    } else {
-                        setSuccessMsg('');
-                        setOtpChannel(res.data.smsSent ? 'sms' : 'email');
-                    }
-                    setShowOtpInput(true);
-                }
-            }
-        } catch (err) {
-            console.error(err);
-            if (useFirebase) {
-                 setError('Firebase OTP failed. Try disabling Firebase test mode.');
-                 if (window.recaptchaVerifier) {
-                     window.recaptchaVerifier.clear();
-                     window.recaptchaVerifier = null;
-                 }
-            } else {
-                 setError(err.response?.data?.error || 'Failed to send OTP.');
-            }
-        }
-        setLoading(false);
-    };
+            const endpoint = isLogin ? '/api/auth/login' : '/api/auth/send-otp';
+            const payload = isLogin
+                ? { email: formData.email, password: formData.password }
+                : { 
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                    phone: formData.phone,
+                    whatsapp_number: formData.whatsapp_number,
+                    personal_email: formData.personal_email,
+                    role: formData.role
+                  };
 
-    const handleResendEmail = async () => {
-        setResendingEmail(true);
-        try {
-            await axios.post('/api/auth/resend-otp-email', { 
-                email: formData.email, 
-                phone: formData.phone.replace(/\D/g, '') 
+            const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
-            setOtpChannel('email');
+
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.error || 'Failed to process request');
+
+            if (isLogin) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                window.dispatchEvent(new Event('authChange'));
+                navigate(data.user.role === 'vendor' ? '/trainers' : '/jobs');
+            } else {
+                setServerVerificationId(data.verificationId || '');
+                setShowOtpInput(true);
+            }
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to send email.');
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-        setResendingEmail(false);
     };
 
     const handleVerifyAndRegister = async (e) => {
@@ -713,8 +648,7 @@ export default function AuthPage() {
                                     </>
                                 )}
 
-                                <div id="recaptcha-container"></div>
-                                <div className="pt-3">
+                                                                <div className="pt-3">
                                     <button
                                         type="submit"
                                         disabled={loading}
