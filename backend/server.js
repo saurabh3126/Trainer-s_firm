@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const axios = require('axios');
 const cors = require('cors');
+const admin = require('./firebaseAdmin');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -353,9 +354,26 @@ app.post('/api/auth/register', async (req, res) => {
             return res.status(400).json({ error: "The name 'Admin (Priority Job)' is reserved and cannot be used." });
         }
 
-        // OTP validation: if MC verificationId stored, validate against MC API; else check our DB
-        const otpRecord = await OTP.findOne({ email: phone });
-        if (!otpRecord) return res.status(400).json({ error: "OTP session expired. Please restart registration." });
+        const { firebaseIdToken } = req.body;
+        
+        if (firebaseIdToken) {
+            try {
+                const decodedToken = await admin.auth().verifyIdToken(firebaseIdToken);
+                const verifiedPhone = decodedToken.phone_number; // e.g. +919876543210
+                const submittedPhone = `+91${phone}`;
+                
+                if (verifiedPhone !== submittedPhone) {
+                     return res.status(400).json({ error: "Verified phone number does not match submitted phone." });
+                }
+                // Phone is verified by Firebase! Skip Message Central.
+            } catch (err) {
+                console.error("Firebase token error:", err);
+                return res.status(400).json({ error: "Invalid Firebase OTP token." });
+            }
+        } else {
+            // OTP validation: if MC verificationId stored, validate against MC API; else check our DB
+            const otpRecord = await OTP.findOne({ email: phone });
+            if (!otpRecord) return res.status(400).json({ error: "OTP session expired. Please restart registration." });
 
         const verificationId = otpRecord.otp; // stored as verificationId or plain OTP code
         const isMcFlow = verificationId && verificationId.length !== 6; // MC verificationIds are long strings/UUIDs
@@ -376,6 +394,7 @@ app.post('/api/auth/register', async (req, res) => {
             // Email fallback OTP — check our DB
             if (otpRecord.otp !== otp) return res.status(400).json({ error: "Invalid or expired OTP." });
         }
+        } // end of if(!firebaseIdToken) else block
 
         
         // Final duplicate check before creation

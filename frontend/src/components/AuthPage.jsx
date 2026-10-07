@@ -117,6 +117,17 @@ export default function AuthPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const setupRecaptcha = () => {
+        if (!window.recaptchaVerifier && auth) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                size: 'invisible',
+                callback: () => {
+                    console.log("recaptcha resolved");
+                }
+            });
+        }
+    };
+
     const handleSendOtp = async (e) => {
         e.preventDefault();
         setError('');
@@ -170,19 +181,39 @@ export default function AuthPage() {
 
         setLoading(true);
         try {
-            const res = await axios.post('/api/auth/send-otp', { email: formData.email, phone: formData.phone.replace(/\D/g, '') });
-            if (res.data.success) {
-                if (res.data.smsFailed) {
-                    setError('SMS failed to send. Please click "Send to email instead" below.');
-                    setOtpChannel('sms');
-                } else {
-                    setSuccessMsg('');
-                    setOtpChannel(res.data.smsSent ? 'sms' : 'email');
-                }
+            if (useFirebase && auth) {
+                setupRecaptcha();
+                const appVerifier = window.recaptchaVerifier;
+                const formattedPhone = `+91${formData.phone.replace(/\D/g, '')}`;
+                const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+                window.confirmationResult = confirmationResult;
+                setSuccessMsg('');
+                setOtpChannel('sms');
                 setShowOtpInput(true);
+            } else {
+                const res = await axios.post('/api/auth/send-otp', { email: formData.email, phone: formData.phone.replace(/\D/g, '') });
+                if (res.data.success) {
+                    if (res.data.smsFailed) {
+                        setError('SMS failed to send. Please click "Send to email instead" below.');
+                        setOtpChannel('sms');
+                    } else {
+                        setSuccessMsg('');
+                        setOtpChannel(res.data.smsSent ? 'sms' : 'email');
+                    }
+                    setShowOtpInput(true);
+                }
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to send OTP.');
+            console.error(err);
+            if (useFirebase) {
+                 setError('Firebase OTP failed. Try disabling Firebase test mode.');
+                 if (window.recaptchaVerifier) {
+                     window.recaptchaVerifier.clear();
+                     window.recaptchaVerifier = null;
+                 }
+            } else {
+                 setError(err.response?.data?.error || 'Failed to send OTP.');
+            }
         }
         setLoading(false);
     };
@@ -222,7 +253,18 @@ export default function AuthPage() {
                 final_resume_public_id = uploadRes.data.public_id;
             }
 
-            const payload = { ...formData, otp, resume_link: final_resume_url, resume_public_id: final_resume_public_id };
+            let firebaseIdToken = null;
+            if (useFirebase && window.confirmationResult) {
+                try {
+                    const result = await window.confirmationResult.confirm(otp);
+                    firebaseIdToken = await result.user.getIdToken();
+                } catch (fbErr) {
+                    setLoading(false);
+                    return setError("Invalid Firebase OTP.");
+                }
+            }
+
+            const payload = { ...formData, otp, firebaseIdToken, resume_link: final_resume_url, resume_public_id: final_resume_public_id };
             const res = await register(payload);
 
             if (res?.success) {
