@@ -376,13 +376,6 @@ export default function AuthPage() {
                                         </div>
                                         <div className="pt-2">
                                             
-                                            {!isLogin && (
-                                                <div className="flex items-center gap-2 mt-4 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
-                                                <input type="checkbox" id="useFirebase" checked={useFirebase} onChange={(e) => setUseFirebase(e.target.checked)} className="w-4 h-4 rounded border-zinc-300 text-black focus:ring-black cursor-pointer" />
-                                                <label htmlFor="useFirebase" className="text-xs font-semibold text-zinc-700 cursor-pointer">TEST MODE: Use Firebase OTP</label>
-                                                  <div id="recaptcha-container"></div>
-                                            </div>
-                                            )}
                                             <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
                                                 {loading ? 'SENDING...' : 'SEND OTP'}
                                             </button>
@@ -405,13 +398,6 @@ export default function AuthPage() {
                                         </div>
                                         <div className="pt-2">
                                             
-                                            {!isLogin && (
-                                                <div className="flex items-center gap-2 mt-4 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
-                                                <input type="checkbox" id="useFirebase" checked={useFirebase} onChange={(e) => setUseFirebase(e.target.checked)} className="w-4 h-4 rounded border-zinc-300 text-black focus:ring-black cursor-pointer" />
-                                                <label htmlFor="useFirebase" className="text-xs font-semibold text-zinc-700 cursor-pointer">TEST MODE: Use Firebase OTP</label>
-                                                  <div id="recaptcha-container"></div>
-                                            </div>
-                                            )}
                                             <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
                                                 {loading ? 'RESETTING...' : 'RESET PASSWORD'}
                                             </button>
@@ -727,6 +713,7 @@ export default function AuthPage() {
                                     </>
                                 )}
 
+                                <div id="recaptcha-container"></div>
                                 <div className="pt-3">
                                     <button
                                         type="submit"
