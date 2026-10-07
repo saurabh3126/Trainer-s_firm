@@ -208,9 +208,8 @@ async function sendSmsOtp(phone, otp) {
     const res = await axios.post(
         'https://www.fast2sms.com/dev/bulkV2',
         {
-            message: `Your Trainer Firm verification code is: ${otp}`,
-            route: 'q',
-            flash: 0,
+            variables_values: otp,
+            route: 'otp',
             numbers: phone
         },
         {
