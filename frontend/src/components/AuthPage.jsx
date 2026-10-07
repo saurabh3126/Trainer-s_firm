@@ -375,6 +375,13 @@ export default function AuthPage() {
                                             <input type="text" required className={getInputCls('email')} value={forgotContact} onChange={e => setForgotContact(e.target.value)} placeholder="email@example.com or 9876543210" />
                                         </div>
                                         <div className="pt-2">
+                                            
+                                            {!isLogin && (
+                                                <div className="flex items-center gap-2 mt-4 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                                <input type="checkbox" id="useFirebase" checked={useFirebase} onChange={(e) => setUseFirebase(e.target.checked)} className="w-4 h-4 rounded border-zinc-300 text-black focus:ring-black cursor-pointer" />
+                                                <label htmlFor="useFirebase" className="text-xs font-semibold text-zinc-700 cursor-pointer">TEST MODE: Use Firebase OTP</label>
+                                            </div>
+                                            )}
                                             <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
                                                 {loading ? 'SENDING...' : 'SEND OTP'}
                                             </button>
@@ -396,6 +403,13 @@ export default function AuthPage() {
                                             )}
                                         </div>
                                         <div className="pt-2">
+                                            
+                                            {!isLogin && (
+                                                <div className="flex items-center gap-2 mt-4 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                                <input type="checkbox" id="useFirebase" checked={useFirebase} onChange={(e) => setUseFirebase(e.target.checked)} className="w-4 h-4 rounded border-zinc-300 text-black focus:ring-black cursor-pointer" />
+                                                <label htmlFor="useFirebase" className="text-xs font-semibold text-zinc-700 cursor-pointer">TEST MODE: Use Firebase OTP</label>
+                                            </div>
+                                            )}
                                             <button type="submit" disabled={loading} className="w-full bg-black hover:bg-zinc-800 text-white py-2.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50">
                                                 {loading ? 'RESETTING...' : 'RESET PASSWORD'}
                                             </button>
