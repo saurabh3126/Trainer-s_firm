@@ -198,40 +198,26 @@ app.post('/api/upload', (req, res) => {
 // ==========================================
 // 5. AUTHENTICATION ROUTES
 // ==========================================
-// ============================================================
-// Message Central: Get auth token (runs fresh per OTP request)
-// ============================================================
-async function getMCToken() {
-    const encoded = Buffer.from(process.env.MC_PASSWORD).toString('base64');
-    const url = `https://cpaas.messagecentral.com/auth/v1/authentication/token?customerId=${process.env.MC_CUSTOMER_ID}&key=${encoded}&scope=NEW&country=91`;
-    const res = await axios.get(url, { timeout: 5000 });
-    return res.data.token;
-}
+
 
 // ============================================================
-// Message Central: Send OTP via SMS
+// Fast2SMS: Send OTP via SMS
 // ============================================================
 async function sendSmsOtp(phone, otp) {
-    const token = await getMCToken();
-    // New Message Central platform — uses verificationId flow (no custom message text)
+    if (!process.env.FAST2SMS_API_KEY) throw new Error("FAST2SMS_API_KEY missing");
     const res = await axios.post(
-        'https://cpaas.messagecentral.com/verification/v3/send',
-        null,
+        'https://www.fast2sms.com/dev/bulkV2',
         {
-            params: {
-                countryCode: '91',
-                customerId: process.env.MC_CUSTOMER_ID,
-                flowType: 'SMS',
-                mobileNumber: phone,
-                type: 'OTP',
-                senderId: process.env.MC_SENDER_ID || 'VENTYS',
-                otpLength: 6,
-            },
-            headers: { authToken: token },
+            variables_values: otp,
+            route: 'otp',
+            numbers: phone
+        },
+        {
+            headers: { authorization: process.env.FAST2SMS_API_KEY },
             timeout: 10000
         }
     );
-    return res.data; // contains verificationId for later validation
+    return res.data;
 }
 
 app.post('/api/auth/send-otp', async (req, res) => {
@@ -252,17 +238,18 @@ app.post('/api/auth/send-otp', async (req, res) => {
                 return res.status(400).json({ error: 'Phone number is already registered. Please log in.' });
         }
 
-        // ----- PRIMARY: Send via SMS (Message Central) — MC generates & delivers its own OTP -----
-        if (phone && process.env.MC_CUSTOMER_ID && process.env.MC_PASSWORD) {
+        // ----- PRIMARY: Send via SMS (Fast2SMS) -----
+        if (phone && process.env.FAST2SMS_API_KEY) {
             try {
-                const mcRes = await sendSmsOtp(phone);
-                const verificationId = mcRes && mcRes.data && mcRes.data.verificationId;
-                // Store MC verificationId keyed by phone so register can validate it
+                const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                await sendSmsOtp(phone, generatedOtp);
+                
                 await OTP.findOneAndDelete({ email: phone });
-                await OTP.create({ email: phone, otp: verificationId || 'mc_sent' });
-                return res.json({ success: true, smsSent: true, verificationId, message: 'OTP sent to your phone.' });
+                await OTP.create({ email: phone, otp: generatedOtp });
+                
+                return res.json({ success: true, smsSent: true, message: 'OTP sent to your phone.' });
             } catch (smsErr) {
-                console.error('[MC SMS Error]', smsErr?.response?.data || smsErr.message);
+                console.error('[Fast2SMS Error]', smsErr?.response?.data || smsErr.message);
                 if (!email) {
                     return res.json({ success: false, smsSent: false, smsFailed: true, error: 'SMS delivery failed. No email fallback available.' });
                 }
@@ -371,30 +358,14 @@ app.post('/api/auth/register', async (req, res) => {
                 return res.status(400).json({ error: "Invalid Firebase OTP token." });
             }
         } else {
-            // OTP validation: if MC verificationId stored, validate against MC API; else check our DB
+            // Check our DB for the generated Fast2SMS OTP or Email OTP
             const otpRecord = await OTP.findOne({ email: phone });
             if (!otpRecord) return res.status(400).json({ error: "OTP session expired. Please restart registration." });
-
-        const verificationId = otpRecord.otp; // stored as verificationId or plain OTP code
-        const isMcFlow = verificationId && verificationId.length !== 6; // MC verificationIds are long strings/UUIDs
-        if (isMcFlow) {
-            // Validate against Message Central
-            try {
-                const mcToken = await getMCToken();
-                await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
-                    params: { verificationId, code: otp, customerId: process.env.MC_CUSTOMER_ID },
-                    headers: { authToken: mcToken },
-                    timeout: 8000
-                });
-            } catch (mcErr) {
-                const errMsg = mcErr?.response?.data?.message || 'Invalid OTP.';
-                return res.status(400).json({ error: errMsg });
+            
+            if (otpRecord.otp !== otp) {
+                return res.status(400).json({ error: "Invalid or expired OTP." });
             }
-        } else {
-            // Email fallback OTP — check our DB
-            if (otpRecord.otp !== otp) return res.status(400).json({ error: "Invalid or expired OTP." });
         }
-        } // end of if(!firebaseIdToken) else block
 
         
         // Final duplicate check before creation
@@ -478,32 +449,17 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
         if (isPhone) {
             try {
-                const mcToken = await getMCToken();
-                const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', null, {
-                    params: {
-                        countryCode: '91',
-                        customerId: process.env.MC_CUSTOMER_ID,
-                        flowType: 'SMS',
-                        mobileNumber: contact,
-                        type: 'OTP',
-                        senderId: process.env.MC_SENDER_ID || 'VENTYS',
-                        otpLength: 6
-                    },
-                    headers: { authToken: mcToken },
-                    timeout: 10000
-                });
-                
-                const vId = otpRes.data?.data?.verificationId;
-                if (!vId) throw new Error("Failed to get verification ID from SMS provider.");
+                const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                await sendSmsOtp(contact, generatedOtp);
                 
                 await OTP.findOneAndUpdate(
                     { email: contact },
-                    { otp: vId, mc_verification_id: 'forgot_password_flow' },
+                    { otp: generatedOtp, mc_verification_id: 'forgot_password_flow' },
                     { upsert: true, new: true }
                 );
                 return res.status(200).json({ success: true, message: 'OTP sent to mobile' });
             } catch (err) {
-                console.error("SMS Send Error:", err?.response?.data || err.message);
+                console.error("Fast2SMS Send Error:", err?.response?.data || err.message);
                 return res.status(500).json({ error: 'Failed to send SMS OTP' });
             }
         } else {
@@ -536,23 +492,8 @@ app.post('/api/auth/reset-password', async (req, res) => {
         const otpRecord = await OTP.findOne({ email: contact });
         if (!otpRecord) return res.status(400).json({ error: 'No active OTP session found.' });
 
-        const isPhone = /^[0-9]+$/.test(contact);
-        
-        if (isPhone) {
-            try {
-                const mcToken = await getMCToken();
-                await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
-                    params: { verificationId: otpRecord.otp, code: otp, customerId: process.env.MC_CUSTOMER_ID },
-                    headers: { authToken: mcToken },
-                    timeout: 8000
-                });
-            } catch (mcErr) {
-                return res.status(400).json({ error: 'Invalid or expired OTP.' });
-            }
-        } else {
-            if (otpRecord.otp !== otp) {
-                return res.status(400).json({ error: 'Invalid or expired OTP.' });
-            }
+        if (otpRecord.otp !== otp) {
+            return res.status(400).json({ error: 'Invalid or expired OTP.' });
         }
 
         const user = await User.findOne({ $or: [{ email: contact }, { phone: contact }] });
@@ -1065,21 +1006,8 @@ app.put('/api/users/profile', authenticate, async (req, res) => {
             const otpRecord = await OTP.findOne({ email: phone });
             if (!otpRecord) return res.status(400).json({ error: "OTP session expired or not found." });
 
-            const verificationId = otpRecord.otp;
-            const isMcFlow = verificationId && verificationId.length !== 6;
-            if (isMcFlow) {
-                try {
-                    const mcToken = await getMCToken();
-                    await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
-                        params: { verificationId, code: otp, customerId: process.env.MC_CUSTOMER_ID },
-                        headers: { authToken: mcToken },
-                        timeout: 8000
-                    });
-                } catch (mcErr) {
-                    return res.status(400).json({ error: 'Invalid OTP for new phone number.' });
-                }
-            } else {
-                if (otpRecord.otp !== otp) return res.status(400).json({ error: "Invalid OTP for new phone number." });
+            if (otpRecord.otp !== otp) {
+                return res.status(400).json({ error: "Invalid OTP for new phone number." });
             }
 
             const existingPhone = await User.findOne({ phone });
