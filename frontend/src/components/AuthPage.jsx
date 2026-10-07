@@ -2,6 +2,9 @@ import { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { auth } from "../firebase";
+
 import { Loader2, CheckCircle2, AlertCircle, ArrowLeft, Eye, EyeOff, X } from 'lucide-react';
 
 export default function AuthPage() {
@@ -182,6 +185,7 @@ export default function AuthPage() {
 
         setLoading(true);
         try {
+            console.log('useFirebase:', useFirebase, 'auth:', auth);
             if (useFirebase && auth) {
                 setupRecaptcha();
                 const appVerifier = window.recaptchaVerifier;
