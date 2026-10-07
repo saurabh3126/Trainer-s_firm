@@ -169,6 +169,28 @@ export default function AuthPage() {
         }
     };
 
+    const handleResendEmail = async () => {
+        if (!formData.email) {
+            setError("Email is required to use fallback.");
+            return;
+        }
+        setResendingEmail(true);
+        setError('');
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/resend-otp-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email, phone: formData.phone })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to resend email');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setResendingEmail(false);
+        }
+    };
+
     const handleVerifyAndRegister = async (e) => {
         e.preventDefault();
         setLoading(true);
