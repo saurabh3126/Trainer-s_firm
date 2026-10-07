@@ -201,6 +201,14 @@ app.post('/api/upload', (req, res) => {
 
 
 // ============================================================
+
+async function getMCToken() {
+    const encoded = Buffer.from(process.env.MC_PASSWORD).toString('base64');
+    const url = `https://cpaas.messagecentral.com/auth/v1/authentication/token?customerId=${process.env.MC_CUSTOMER_ID}&key=${encoded}&scope=NEW&country=91`;
+    const res = await axios.get(url, { timeout: 5000 });
+    return res.data.token;
+}
+
 // Fast2SMS: Send OTP via SMS
 // ============================================================
 async function sendSmsOtp(phone, otp) {
