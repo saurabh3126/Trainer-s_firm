@@ -246,7 +246,7 @@ app.post('/api/auth/send-otp', async (req, res) => {
                 return res.status(400).json({ error: 'Phone number is already registered. Please log in.' });
         }
 
-                // ----- PRIMARY: Send via SMS (Message Central) -----
+        // ----- PRIMARY: Send via SMS (Message Central) -----
         if (phone && process.env.MC_CUSTOMER_ID && process.env.MC_PASSWORD) {
             try {
                 const mcToken = await getMCToken();
@@ -261,10 +261,12 @@ app.post('/api/auth/send-otp', async (req, res) => {
                 return res.json({ success: true, smsSent: true, message: 'OTP sent to your phone.' });
             } catch (smsErr) {
                 console.error('[MC SMS Error]', smsErr?.response?.data || smsErr.message);
-                if (!email) return res.json({ success: false, smsSent: false, smsFailed: true, error: 'SMS delivery failed. No email fallback available.' });
+                if (!email) {
+                    return res.json({ success: false, smsSent: false, smsFailed: true, error: 'SMS delivery failed. No email fallback available.' });
+                }
+                // SMS failed but email provided
             }
         }
-                // SMS failed but email provided
 
         // ----- FALLBACK: Generate our own OTP for email delivery -----
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -385,42 +387,9 @@ app.post('/api/auth/register', async (req, res) => {
                     return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
                 }
             } else {
-                const verificationId = otpRecord.otp;
-            const isMcFlow = verificationId && verificationId.length > 6;
-            if (isMcFlow) {
-                try {
-                    const mcToken = await getMCToken();
-                    await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
-                        params: { verificationId, code: otp, customerId: process.env.MC_CUSTOMER_ID },
-                        headers: { authToken: mcToken },
-                        timeout: 8000
-                    });
-                } catch (mcErr) {
-                    return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
-                }
-            } else {
-                const verificationId = otpRecord.otp;
-            const isMcFlow = verificationId && verificationId.length > 6;
-            if (isMcFlow) {
-                try {
-                    const mcToken = await getMCToken();
-                    await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
-                        params: { verificationId, code: otp, customerId: process.env.MC_CUSTOMER_ID },
-                        headers: { authToken: mcToken },
-                        timeout: 8000
-                    });
-                } catch (mcErr) {
-                    return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
-                }
-            } else {
                 if (String(otpRecord.otp) !== String(otp)) {
                     return res.status(400).json({ error: "Invalid or expired OTP." });
                 }
-            });
-                }
-            });
-                }
-            });
             }
         }
 
@@ -519,8 +488,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
                 console.error("SMS Send Error:", err?.response?.data || err.message);
                 return res.status(500).json({ error: 'Failed to send SMS OTP' });
             }
-        });
-            }
         } else {
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
             await OTP.findOneAndUpdate(
@@ -551,8 +518,23 @@ app.post('/api/auth/reset-password', async (req, res) => {
         const otpRecord = await OTP.findOne({ email: contact });
         if (!otpRecord) return res.status(400).json({ error: 'No active OTP session found.' });
 
-        if (String(otpRecord.otp) !== String(otp)) {
-            return res.status(400).json({ error: 'Invalid or expired OTP.' });
+        const verificationId = otpRecord.otp;
+        const isMcFlow = verificationId && verificationId.length > 6;
+        if (isMcFlow) {
+            try {
+                const mcToken = await getMCToken();
+                await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
+                    params: { verificationId, code: otp, customerId: process.env.MC_CUSTOMER_ID },
+                    headers: { authToken: mcToken },
+                    timeout: 8000
+                });
+            } catch (mcErr) {
+                return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
+            }
+        } else {
+            if (String(otpRecord.otp) !== String(otp)) {
+                return res.status(400).json({ error: 'Invalid or expired OTP.' });
+            }
         }
 
         const user = await User.findOne({ $or: [{ email: contact }, { phone: contact }] });
@@ -1065,8 +1047,23 @@ app.put('/api/users/profile', authenticate, async (req, res) => {
             const otpRecord = await OTP.findOne({ email: phone });
             if (!otpRecord) return res.status(400).json({ error: "OTP session expired or not found." });
 
-            if (String(otpRecord.otp) !== String(otp)) {
-                return res.status(400).json({ error: "Invalid OTP for new phone number." });
+            const verificationId = otpRecord.otp;
+            const isMcFlow = verificationId && verificationId.length > 6;
+            if (isMcFlow) {
+                try {
+                    const mcToken = await getMCToken();
+                    await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
+                        params: { verificationId, code: otp, customerId: process.env.MC_CUSTOMER_ID },
+                        headers: { authToken: mcToken },
+                        timeout: 8000
+                    });
+                } catch (mcErr) {
+                    return res.status(400).json({ error: 'Invalid OTP for new phone number.' });
+                }
+            } else {
+                if (String(otpRecord.otp) !== String(otp)) {
+                    return res.status(400).json({ error: "Invalid OTP for new phone number." });
+                }
             }
 
             const existingPhone = await User.findOne({ phone });
