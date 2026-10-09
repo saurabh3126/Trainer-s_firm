@@ -15,7 +15,7 @@ export default function LandingPage() {
     const fadeUp = {
         initial: { opacity: 0, y: 40 },
         whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: "-50px" },
+        viewport: { once: false, amount: 0.2 },
         transition: { duration: 0.6, ease: "easeOut" }
     };
     
@@ -239,7 +239,7 @@ export default function LandingPage() {
                     </p>
                 </motion.div>
 
-                <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{once: true, margin: "-50px"}} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{once: false, amount: 0.2}} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[
                         { num: '01', title: 'Structured briefs', desc: 'Turn raw WhatsApp messages into complete, actionable training requirements with clear duration, budget, and scope.' },
                         { num: '02', title: 'Detailed profiles', desc: 'Review candidate profiles with self-described technical depth, resume links, and industry track records.' },
@@ -330,7 +330,7 @@ export default function LandingPage() {
                     <h2 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight mt-2">From an unstructured request to a confirmed trainer.</h2>
                 </motion.div>
 
-                <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{once: true, margin: "-50px"}} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{once: false, amount: 0.2}} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     {[
                         { num: '01. PASTE', title: 'Raw Message', desc: 'Paste unformatted requirement text directly from WhatsApp or email.' },
                         { num: '02. PARSE', title: 'AI Structure', desc: 'Extracts duration, mode, technology, and normalizes salary amounts.' },
