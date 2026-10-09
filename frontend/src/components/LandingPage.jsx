@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { ArrowRight, Mail, Phone, MapPin, Briefcase, Clock , BadgeCheck} from 'lucide-react';
@@ -10,6 +11,23 @@ export default function LandingPage() {
     const [liveJobs, setLiveJobs] = useState([]);
     const [jobCount, setJobCount] = useState(0);
     const [loading, setLoading] = useState(true);
+
+    const fadeUp = {
+        initial: { opacity: 0, y: 40 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, margin: "-50px" },
+        transition: { duration: 0.6, ease: "easeOut" }
+    };
+    
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        show: { opacity: 1, transition: { staggerChildren: 0.15 } }
+    };
+    
+    const staggerItem = {
+        hidden: { opacity: 0, y: 30 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+    };
 
     useEffect(() => {
         const fetchPreviewJobs = async () => {
@@ -49,7 +67,7 @@ export default function LandingPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
                     
                     {/* Left Column */}
-                    <div className="lg:col-span-7 space-y-6">
+                    <motion.div {...fadeUp} className="lg:col-span-7 space-y-6">
                         <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-black tracking-tighter leading-[1.05] drop-shadow-sm">
                             The right trainer.<br />
                             The right brief. No<br />
@@ -87,10 +105,10 @@ export default function LandingPage() {
                                 </Link>
                             )}
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Right Column - BLACK OUTER CARD */}
-                    <div className="lg:col-span-5 relative z-20">
+                    <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }} className="lg:col-span-5 relative z-20">
                             <div className="bg-black border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.5)] transition-all duration-300 relative overflow-hidden">
                                 
                                 <div className="flex items-center justify-between pb-4 border-b border-slate-800 relative z-10">
@@ -202,14 +220,14 @@ export default function LandingPage() {
                                 </div>
                             </div>
                         
-                    </div>
+                    </motion.div>
 
                 </div>
             </section>
 
             {/* VALUE PROPOSITION */}
             <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 md:pt-16 md:pb-28 border-t border-slate-100 relative z-10">
-                <div className="max-w-3xl mb-12">
+                <motion.div {...fadeUp} className="max-w-3xl mb-12">
                     <span className="text-xs font-bold tracking-widest uppercase text-slate-500">
                         A Better Operating System
                     </span>
@@ -219,16 +237,16 @@ export default function LandingPage() {
                     <p className="text-slate-600 mt-3 text-sm sm:text-base">
                         Trainer Firm replaces scattered WhatsApp screenshots and informal requirements with clear, structured, accountable workflows. Stop chasing responses and start managing your end-to-end training engagements with complete confidence and transparency.
                     </p>
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{once: true, margin: "-50px"}} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[
                         { num: '01', title: 'Structured briefs', desc: 'Turn raw WhatsApp messages into complete, actionable training requirements with clear duration, budget, and scope.' },
                         { num: '02', title: 'Detailed profiles', desc: 'Review candidate profiles with self-described technical depth, resume links, and industry track records.' },
                         { num: '03', title: 'Direct coordination', desc: 'Immediate one-to-one WhatsApp coordination with pre-formatted requirements and direct candidate credentials.' },
                         { num: '04', title: 'Clear oversight', desc: 'Track open roles, applications, fulfillment, and responses in real time with transparent status logs.' }
                     ].map((feature, i) => (
-                        <div key={i} className="group relative p-[2px] rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] hover:scale-[1.01] cursor-pointer">
+                        <motion.div variants={staggerItem} key={i} className="group relative p-[2px] rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] hover:scale-[1.01] cursor-pointer">
                             {/* Continuous Moving Border Beam */}
                             <div className="moving-border-beam" />
                             {/* Static Border Fallback */}
@@ -241,9 +259,9 @@ export default function LandingPage() {
                                     <p className="text-sm text-slate-600 leading-relaxed">{feature.desc}</p>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             </section>
 
             {/* DUAL COMPARISON */}
@@ -251,7 +269,7 @@ export default function LandingPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
                         
-                        <div id="for-trainers" className="space-y-6">
+                        <motion.div {...fadeUp} id="for-trainers" className="space-y-6">
                             <div>
                                 <span className="text-xs font-bold tracking-widest text-slate-500 uppercase">For Trainers</span>
                                 <h3 className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight mt-1">Find work that fits your expertise.</h3>
@@ -274,9 +292,9 @@ export default function LandingPage() {
                                     Explore Trainer Board <ArrowRight className="w-4 h-4" />
                                 </Link>
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div id="for-vendors" className="space-y-6">
+                        <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }} id="for-vendors" className="space-y-6">
                             <div>
                                 <span className="text-xs font-bold tracking-widest text-slate-500 uppercase">For Vendors</span>
                                 <h3 className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight mt-1">Turn demand into a complete brief.</h3>
@@ -299,7 +317,7 @@ export default function LandingPage() {
                                     Go to Vendor Dashboard <ArrowRight className="w-4 h-4" />
                                 </Link>
                             </div>
-                        </div>
+                        </motion.div>
 
                     </div>
                 </div>
@@ -307,35 +325,35 @@ export default function LandingPage() {
 
             {/* END-TO-END WORKFLOW (Thicker borders applied here) */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 relative z-10">
-                <div className="max-w-3xl mb-12">
+                <motion.div {...fadeUp} className="max-w-3xl mb-12">
                     <span className="text-xs font-bold tracking-widest uppercase text-slate-500">End-to-End Workflow</span>
                     <h2 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight mt-2">From an unstructured request to a confirmed trainer.</h2>
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{once: true, margin: "-50px"}} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     {[
                         { num: '01. PASTE', title: 'Raw Message', desc: 'Paste unformatted requirement text directly from WhatsApp or email.' },
                         { num: '02. PARSE', title: 'AI Structure', desc: 'Extracts duration, mode, technology, and normalizes salary amounts.' },
                         { num: '03. PUBLISH', title: 'Live Listing', desc: 'Appears immediately on the trainer board with clean, structured parameters.' },
                         { num: '04. TRAIN', title: 'Direct Match', desc: 'Trainers review criteria and apply with resumes and contact profiles.' }
                     ].map((step, i) => (
-                        <div key={i} className="p-6 bg-white border-2 border-slate-300 rounded-2xl shadow-md hover:-translate-y-2 hover:border-slate-400 hover:shadow-xl transition-all duration-300">
+                        <motion.div variants={staggerItem} key={i} className="p-6 bg-white border-2 border-slate-300 rounded-2xl shadow-md hover:-translate-y-2 hover:border-slate-400 hover:shadow-xl transition-all duration-300">
                             <div className="text-xs font-mono font-bold text-slate-400 mb-4">{step.num}</div>
                             <h4 className="text-sm font-bold text-black mb-1">{step.title}</h4>
                             <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
-                        </div>
+                        </motion.div>
                     ))}
-                    <div className="p-6 bg-black text-white border-2 border-black rounded-2xl shadow-md hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+                    <motion.div variants={staggerItem} className="p-6 bg-black text-white border-2 border-black rounded-2xl shadow-md hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
                         <div className="text-xs font-mono font-bold text-slate-400 mb-4">05. FULFILL</div>
                         <h4 className="text-sm font-bold text-white mb-1">Track & Close</h4>
                         <p className="text-xs text-slate-400 leading-relaxed">Record trainer credentials, mark complete, and maintain full record.</p>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </section>
 
             {/* CALL TO ACTION */}
             <section className="bg-black text-white py-24 border-t border-slate-900 relative z-10">
-                <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
+                <motion.div {...fadeUp} className="max-w-4xl mx-auto px-4 text-center space-y-6">
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
                         Make your next training engagement<br className="hidden sm:inline" /> easier to trust.
                     </h2>
@@ -348,7 +366,7 @@ export default function LandingPage() {
                             <ArrowRight className="w-5 h-5 text-black" />
                         </Link>
                     </div>
-                </div>
+                </motion.div>
             </section>
 
         </div>
