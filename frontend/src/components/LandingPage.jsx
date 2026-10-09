@@ -13,20 +13,20 @@ export default function LandingPage() {
     const [loading, setLoading] = useState(true);
 
     const fadeUp = {
-        initial: { opacity: 0, y: 40 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: false, amount: 0.2 },
-        transition: { duration: 0.6, ease: "easeOut" }
+        initial: { opacity: 0, scale: 0.85, y: 30 },
+        whileInView: { opacity: 1, scale: 1, y: 0 },
+        viewport: { once: false, amount: 0.15 },
+        transition: { type: "spring", stiffness: 100, damping: 20, mass: 1 }
     };
     
     const staggerContainer = {
         hidden: { opacity: 0 },
-        show: { opacity: 1, transition: { staggerChildren: 0.15 } }
+        show: { opacity: 1, transition: { staggerChildren: 0.1 } }
     };
     
     const staggerItem = {
-        hidden: { opacity: 0, y: 30 },
-        show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+        hidden: { opacity: 0, scale: 0.85, y: 20 },
+        show: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
     };
 
     useEffect(() => {
