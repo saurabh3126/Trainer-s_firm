@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import Preloader from './components/Preloader.jsx';
 import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
+import Lenis from 'lenis';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import LandingPage from './components/LandingPage.jsx';
 import MoltenMetal from './components/MoltenMetal.jsx';
@@ -151,6 +152,28 @@ function AppLayout() {
 }
 
 function App() {
+    useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: 'vertical', 
+      gestureDirection: 'vertical',
+      smooth: true,
+      smoothTouch: false,
+      touchMultiplier: 2
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
   const [ready, setReady] = useState(false);
 
   return (
