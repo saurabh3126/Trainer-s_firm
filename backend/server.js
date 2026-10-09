@@ -246,25 +246,57 @@ app.post('/api/auth/send-otp', async (req, res) => {
                 return res.status(400).json({ error: 'Phone number is already registered. Please log in.' });
         }
 
-        // ----- PRIMARY: Send via SMS (Message Central) -----
-        if (phone && process.env.MC_CUSTOMER_ID && process.env.MC_PASSWORD) {
-            try {
-                const mcToken = await getMCToken();
-                const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', null, {
-                    params: { countryCode: '91', customerId: process.env.MC_CUSTOMER_ID, flowType: 'SMS', mobileNumber: phone, type: 'OTP', senderId: process.env.MC_SENDER_ID || 'VENTYS', otpLength: 6 },
-                    headers: { authToken: mcToken }, timeout: 10000
-                });
-                const verificationId = otpRes.data?.data?.verificationId;
-                if (!verificationId) throw new Error("Failed to get verification ID from MC");
-                await OTP.findOneAndDelete({ email: phone });
-                await OTP.create({ email: phone, otp: verificationId });
-                return res.json({ success: true, smsSent: true, message: 'OTP sent to your phone.' });
-            } catch (smsErr) {
-                console.error('[MC SMS Error]', smsErr?.response?.data || smsErr.message);
-                if (!email) {
-                    return res.json({ success: false, smsSent: false, smsFailed: true, error: 'SMS delivery failed. No email fallback available.' });
+        // ----- PRIMARY: Try WhatsApp (Fast2SMS) -> Fallback: SMS (Message Central) -----
+        if (phone) {
+            let sentViaWhatsapp = false;
+
+            // 1. Try WhatsApp via Fast2SMS
+            if (process.env.FAST2SMS_API_KEY && process.env.FAST2SMS_WHATSAPP_OTP_ID) {
+                try {
+                    const waRes = await axios.post('https://www.fast2sms.com/dev/otp/send', {
+                        otp_id: process.env.FAST2SMS_WHATSAPP_OTP_ID,
+                        mobile: phone
+                    }, {
+                        headers: { 
+                            'authorization': process.env.FAST2SMS_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        timeout: 8000
+                    });
+
+                    if (waRes.data && waRes.data.return === true) {
+                        sentViaWhatsapp = true;
+                        await OTP.findOneAndDelete({ email: phone });
+                        await OTP.create({ email: phone, otp: 'FAST2SMS_WA' });
+                        return res.json({ success: true, smsSent: true, message: 'OTP sent to your WhatsApp.' });
+                    } else {
+                        console.error('[Fast2SMS WA Error]', waRes.data);
+                    }
+                } catch (waErr) {
+                    console.error('[Fast2SMS WA Error]', waErr?.response?.data || waErr.message);
                 }
-                // SMS failed but email provided
+            }
+
+            // 2. Fallback to SMS via Message Central
+            if (!sentViaWhatsapp && process.env.MC_CUSTOMER_ID && process.env.MC_PASSWORD) {
+                try {
+                    const mcToken = await getMCToken();
+                    const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', null, {
+                        params: { countryCode: '91', customerId: process.env.MC_CUSTOMER_ID, flowType: 'SMS', mobileNumber: phone, type: 'OTP', senderId: process.env.MC_SENDER_ID || 'VENTYS', otpLength: 6 },
+                        headers: { authToken: mcToken }, timeout: 10000
+                    });
+                    const verificationId = otpRes.data?.data?.verificationId;
+                    if (!verificationId) throw new Error("Failed to get verification ID from MC");
+                    await OTP.findOneAndDelete({ email: phone });
+                    await OTP.create({ email: phone, otp: verificationId });
+                    return res.json({ success: true, smsSent: true, message: 'OTP sent to your phone.' });
+                } catch (smsErr) {
+                    console.error('[MC SMS Error]', smsErr?.response?.data || smsErr.message);
+                    if (!email) {
+                        return res.json({ success: false, smsSent: false, smsFailed: true, error: 'SMS delivery failed. No email fallback available.' });
+                    }
+                    // SMS failed but email provided
+                }
             }
         }
 
@@ -374,8 +406,24 @@ app.post('/api/auth/register', async (req, res) => {
             if (!otpRecord) return res.status(400).json({ error: "OTP session expired. Please restart registration." });
             
             const verificationId = otpRecord.otp;
-            const isMcFlow = verificationId && verificationId.length > 6;
-            if (isMcFlow) {
+            
+            if (verificationId === 'FAST2SMS_WA') {
+                try {
+                    const waVerifyRes = await axios.post('https://www.fast2sms.com/dev/otp/verify', {
+                        mobile: phone || contact,
+                        otp: otp
+                    }, {
+                        headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
+                        timeout: 8000
+                    });
+                    if (!waVerifyRes.data || waVerifyRes.data.return !== true) {
+                        return res.status(400).json({ error: 'Invalid WhatsApp OTP. Please try again.' });
+                    }
+                } catch (waErr) {
+                    console.error("Fast2SMS Verify Error", waErr?.response?.data || waErr.message);
+                    return res.status(400).json({ error: 'Invalid WhatsApp OTP. Please try again.' });
+                }
+            } else if (verificationId && verificationId.length > 6) {
                 try {
                     const mcToken = await getMCToken();
                     await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
@@ -384,11 +432,11 @@ app.post('/api/auth/register', async (req, res) => {
                         timeout: 8000
                     });
                 } catch (mcErr) {
-                    return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
+                    return res.status(400).json({ error: 'Invalid SMS OTP. Please try again.' });
                 }
             } else {
                 if (String(otpRecord.otp) !== String(otp)) {
-                    return res.status(400).json({ error: "Invalid or expired OTP." });
+                    return res.status(400).json({ error: "Invalid or expired Email OTP." });
                 }
             }
         }
@@ -474,19 +522,48 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         const isPhone = /^[0-9]+$/.test(contact);
 
         if (isPhone) {
-            try {
-                const mcToken = await getMCToken();
-                const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', null, {
-                    params: { countryCode: '91', customerId: process.env.MC_CUSTOMER_ID, flowType: 'SMS', mobileNumber: contact, type: 'OTP', senderId: process.env.MC_SENDER_ID || 'VENTYS', otpLength: 6 },
-                    headers: { authToken: mcToken }, timeout: 10000
-                });
-                const vId = otpRes.data?.data?.verificationId;
-                if (!vId) throw new Error("Failed to get verification ID from SMS provider.");
-                await OTP.findOneAndUpdate({ email: contact }, { otp: vId, mc_verification_id: 'forgot_password_flow' }, { upsert: true, new: true });
-                return res.status(200).json({ success: true, message: 'OTP sent to mobile' });
-            } catch (err) {
-                console.error("SMS Send Error:", err?.response?.data || err.message);
-                return res.status(500).json({ error: 'Failed to send SMS OTP' });
+            let sentViaWhatsapp = false;
+
+            // 1. Try WhatsApp via Fast2SMS
+            if (process.env.FAST2SMS_API_KEY && process.env.FAST2SMS_WHATSAPP_OTP_ID) {
+                try {
+                    const waRes = await axios.post('https://www.fast2sms.com/dev/otp/send', {
+                        otp_id: process.env.FAST2SMS_WHATSAPP_OTP_ID,
+                        mobile: contact
+                    }, {
+                        headers: { 
+                            'authorization': process.env.FAST2SMS_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        timeout: 8000
+                    });
+
+                    if (waRes.data && waRes.data.return === true) {
+                        sentViaWhatsapp = true;
+                        await OTP.findOneAndUpdate({ email: contact }, { otp: 'FAST2SMS_WA', mc_verification_id: 'forgot_password_flow' }, { upsert: true, new: true });
+                        return res.status(200).json({ success: true, message: 'OTP sent to WhatsApp' });
+                    }
+                } catch (waErr) {
+                    console.error('[Fast2SMS WA Error]', waErr?.response?.data || waErr.message);
+                }
+            }
+
+            // 2. Fallback to SMS via Message Central
+            if (!sentViaWhatsapp && process.env.MC_CUSTOMER_ID && process.env.MC_PASSWORD) {
+                try {
+                    const mcToken = await getMCToken();
+                    const otpRes = await axios.post('https://cpaas.messagecentral.com/verification/v3/send', null, {
+                        params: { countryCode: '91', customerId: process.env.MC_CUSTOMER_ID, flowType: 'SMS', mobileNumber: contact, type: 'OTP', senderId: process.env.MC_SENDER_ID || 'VENTYS', otpLength: 6 },
+                        headers: { authToken: mcToken }, timeout: 10000
+                    });
+                    const vId = otpRes.data?.data?.verificationId;
+                    if (!vId) throw new Error("Failed to get verification ID from SMS provider.");
+                    await OTP.findOneAndUpdate({ email: contact }, { otp: vId, mc_verification_id: 'forgot_password_flow' }, { upsert: true, new: true });
+                    return res.status(200).json({ success: true, message: 'OTP sent to mobile' });
+                } catch (err) {
+                    console.error("SMS Send Error:", err?.response?.data || err.message);
+                    return res.status(500).json({ error: 'Failed to send SMS OTP' });
+                }
             }
         } else {
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -519,8 +596,24 @@ app.post('/api/auth/reset-password', async (req, res) => {
         if (!otpRecord) return res.status(400).json({ error: 'No active OTP session found.' });
 
         const verificationId = otpRecord.otp;
-        const isMcFlow = verificationId && verificationId.length > 6;
-        if (isMcFlow) {
+        
+        if (verificationId === 'FAST2SMS_WA') {
+            try {
+                const waVerifyRes = await axios.post('https://www.fast2sms.com/dev/otp/verify', {
+                    mobile: contact,
+                    otp: otp
+                }, {
+                    headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
+                    timeout: 8000
+                });
+                if (!waVerifyRes.data || waVerifyRes.data.return !== true) {
+                    return res.status(400).json({ error: 'Invalid WhatsApp OTP. Please try again.' });
+                }
+            } catch (waErr) {
+                console.error("Fast2SMS Verify Error", waErr?.response?.data || waErr.message);
+                return res.status(400).json({ error: 'Invalid WhatsApp OTP. Please try again.' });
+            }
+        } else if (verificationId && verificationId.length > 6) {
             try {
                 const mcToken = await getMCToken();
                 await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
@@ -529,11 +622,11 @@ app.post('/api/auth/reset-password', async (req, res) => {
                     timeout: 8000
                 });
             } catch (mcErr) {
-                return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
+                return res.status(400).json({ error: 'Invalid SMS OTP. Please try again.' });
             }
         } else {
             if (String(otpRecord.otp) !== String(otp)) {
-                return res.status(400).json({ error: 'Invalid or expired OTP.' });
+                return res.status(400).json({ error: 'Invalid or expired Email OTP.' });
             }
         }
 
@@ -1048,8 +1141,24 @@ app.put('/api/users/profile', authenticate, async (req, res) => {
             if (!otpRecord) return res.status(400).json({ error: "OTP session expired or not found." });
 
             const verificationId = otpRecord.otp;
-            const isMcFlow = verificationId && verificationId.length > 6;
-            if (isMcFlow) {
+            
+            if (verificationId === 'FAST2SMS_WA') {
+                try {
+                    const waVerifyRes = await axios.post('https://www.fast2sms.com/dev/otp/verify', {
+                        mobile: phone || contact,
+                        otp: otp
+                    }, {
+                        headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
+                        timeout: 8000
+                    });
+                    if (!waVerifyRes.data || waVerifyRes.data.return !== true) {
+                        return res.status(400).json({ error: 'Invalid WhatsApp OTP for new phone number.' });
+                    }
+                } catch (waErr) {
+                    console.error("Fast2SMS Verify Error", waErr?.response?.data || waErr.message);
+                    return res.status(400).json({ error: 'Invalid WhatsApp OTP for new phone number.' });
+                }
+            } else if (verificationId && verificationId.length > 6) {
                 try {
                     const mcToken = await getMCToken();
                     await axios.get('https://cpaas.messagecentral.com/verification/v3/validateOtp', {
@@ -1058,11 +1167,11 @@ app.put('/api/users/profile', authenticate, async (req, res) => {
                         timeout: 8000
                     });
                 } catch (mcErr) {
-                    return res.status(400).json({ error: 'Invalid OTP for new phone number.' });
+                    return res.status(400).json({ error: 'Invalid SMS OTP for new phone number.' });
                 }
             } else {
                 if (String(otpRecord.otp) !== String(otp)) {
-                    return res.status(400).json({ error: "Invalid OTP for new phone number." });
+                    return res.status(400).json({ error: "Invalid Email OTP for new phone number." });
                 }
             }
 
